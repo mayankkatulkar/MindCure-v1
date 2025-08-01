@@ -78,7 +78,8 @@ def prewarm(proc: JobProcess):
 
 
 async def entrypoint(ctx: JobContext):
-    # each log entry will include these fields
+    # Logging setup
+    # Add any other context you want in all log entries here
     ctx.log_context_fields = {
         "room": ctx.room.name,
     }
@@ -86,7 +87,11 @@ async def entrypoint(ctx: JobContext):
     # Create session with the LLM, STT, TTS, turn detection, and VAD
     session = AgentSession(
         llm=openai.LLM(model="gpt-4o-mini"),
+        # Speech-to-text (STT) is your agent's ears, turning the user's speech into text that the LLM can understand
+        # See all providers at https://docs.livekit.io/agents/integrations/stt/
         stt=deepgram.STT(model="nova-3", language="multi"),
+        # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
+        # See all providers at https://docs.livekit.io/agents/integrations/tts/
         tts=cartesia.TTS(voice="6f84f4b8-58a2-430c-8c79-688dad597532"),
         turn_detection=EnglishModel(),
         vad=ctx.proc.userdata["vad"],
@@ -117,7 +122,6 @@ async def entrypoint(ctx: JobContext):
             noise_cancellation=noise_cancellation.BVC(),
             video_enabled=True,
         ),
-        room_output_options=RoomOutputOptions(transcription_enabled=True),
     )
 
     # 1. join the room when agent is ready
