@@ -13,40 +13,64 @@ from livekit.agents import (
     cli,
     metrics,
 )
-from livekit.agents.llm import function_tool
 from livekit.agents.voice import MetricsCollectedEvent
 from livekit.plugins import cartesia, deepgram, noise_cancellation, openai, silero
-from livekit.plugins.turn_detector.multilingual import MultilingualModel
+from livekit.plugins.turn_detector.english import EnglishModel
+from livekit.agents import (
+    AutoSubscribe,
+)
+
+from llama_index.core import (
+    SimpleDirectoryReader,
+    StorageContext,
+    VectorStoreIndex,
+    load_index_from_storage,
+)
+from pathlib import Path
+
+
+from prompts import AGENT_INSTRUCTIONS, SESSION_INSTRUCTIONS
+from livekit.agents.llm import function_tool
+
 
 logger = logging.getLogger("agent")
 
 load_dotenv(".env.local")
 
+# check if storage already exists
+THIS_DIR = Path(__file__).parent
+PERSIST_DIR = THIS_DIR / "query-engine-storage"
+if not PERSIST_DIR.exists():
+    # load the documents and create the index
+    documents = SimpleDirectoryReader(THIS_DIR / "data").load_data()
+    index = VectorStoreIndex.from_documents(documents)
+    # store it for later
+    index.storage_context.persist(persist_dir=PERSIST_DIR)
+else:
+    # load the existing index
+    storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
+    index = load_index_from_storage(storage_context)
+
 
 class Assistant(Agent):
     def __init__(self) -> None:
-        super().__init__(
-            instructions="""You are a helpful voice AI assistant.
-            You eagerly assist users with their questions by providing information from your extensive knowledge.
-            Your responses are concise, to the point, and without any complex formatting or punctuation.
-            You are curious, friendly, and have a sense of humor.""",
-        )
+        super().__init__(instructions=AGENT_INSTRUCTIONS)
 
     # all functions annotated with @function_tool will be passed to the LLM when this
     # agent is active
     @function_tool
-    async def lookup_weather(self, context: RunContext, location: str):
-        """Use this tool to look up current weather information in the given location.
-
-        If the location is not supported by the weather service, the tool will indicate this. You must tell the user the location's weather is unavailable.
+    async def query_info(self, context: RunContext, query: str):
+        """
+        Use this tool to get the data from RAG model
 
         Args:
-            location: The location to look up weather information for (e.g. city name)
+            query: The query to get the data for
         """
 
-        logger.info(f"Looking up weather for {location}")
-
-        return "sunny with a temperature of 70 degrees."
+        logger.info(f"Querying info for {query}")
+        query_engine = index.as_query_engine(use_async=True)
+        res = await query_engine.aquery(query)
+        return str(res)
 
 
 def prewarm(proc: JobProcess):
@@ -59,23 +83,16 @@ async def entrypoint(ctx: JobContext):
         "room": ctx.room.name,
     }
 
-    # Set up a voice AI pipeline using OpenAI, Cartesia, Deepgram, and the LiveKit turn detector
+    # Create session with the LLM, STT, TTS, turn detection, and VAD
     session = AgentSession(
-        # any combination of STT, LLM, TTS, or realtime API can be used
         llm=openai.LLM(model="gpt-4o-mini"),
         stt=deepgram.STT(model="nova-3", language="multi"),
         tts=cartesia.TTS(voice="6f84f4b8-58a2-430c-8c79-688dad597532"),
-        # use LiveKit's turn detection model
-        turn_detection=MultilingualModel(),
+        turn_detection=EnglishModel(),
         vad=ctx.proc.userdata["vad"],
     )
 
-    # To use the OpenAI Realtime API, use the following session setup instead:
-    # session = AgentSession(
-    #     llm=openai.realtime.RealtimeModel()
-    # )
-
-    # log metrics as they are emitted, and total usage after session is over
+    # Log metrics as they are emitted, and total usage after session is over
     usage_collector = metrics.UsageCollector()
 
     @session.on("metrics_collected")
@@ -87,23 +104,27 @@ async def entrypoint(ctx: JobContext):
         summary = usage_collector.get_summary()
         logger.info(f"Usage: {summary}")
 
-    # shutdown callbacks are triggered when the session is over
+    # Shutdown callbacks are triggered when the session is over    # shutdown callbacks are triggered when the session is over
     ctx.add_shutdown_callback(log_usage)
 
+    # Start the session
     await session.start(
         agent=Assistant(),
         room=ctx.room,
         room_input_options=RoomInputOptions(
             # LiveKit Cloud enhanced noise cancellation
             # - If self-hosting, omit this parameter
-            # - For telephony applications, use `BVCTelephony` for best results
             noise_cancellation=noise_cancellation.BVC(),
+            video_enabled=True,
         ),
         room_output_options=RoomOutputOptions(transcription_enabled=True),
     )
 
-    # join the room when agent is ready
-    await ctx.connect()
+    # 1. join the room when agent is ready
+    await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
+
+    # 2. greet the user
+    await session.say(SESSION_INSTRUCTIONS, allow_interruptions=True)
 
 
 if __name__ == "__main__":
