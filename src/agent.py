@@ -7,7 +7,6 @@ from livekit.agents import (
     JobContext,
     JobProcess,
     RoomInputOptions,
-    RoomOutputOptions,
     RunContext,
     WorkerOptions,
     cli,
