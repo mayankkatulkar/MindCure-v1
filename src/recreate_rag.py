@@ -17,7 +17,7 @@ import logging
 logger = logging.getLogger("recreate_rag")
 
 
-load_dotenv(".env.local")
+load_dotenv("../.env.local")
 
 
 def recreate_rag_embeddings():
