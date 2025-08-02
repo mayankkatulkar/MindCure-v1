@@ -50,6 +50,41 @@ else:
     storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
     index = load_index_from_storage(storage_context)
 
+#
+
+from utils import get_doc_tools
+from pathlib import Path
+from llama_index.llms.openai import OpenAI
+from llama_index.core.agent.workflow import FunctionAgent
+
+# Step 1: Load tools from files
+file_to_tools_dict = {}
+for file in Path("src/data").iterdir():
+    logger.warning(f"Getting tools for file: {file}")
+    vector_tool, summary_tool = get_doc_tools(file, Path(file).stem)
+    file_to_tools_dict[file] = [vector_tool, summary_tool]
+
+initial_tools = [
+    t for file in Path("src/data").iterdir() for t in file_to_tools_dict[file]
+]
+
+logger.warning(f"Number of tools: {len(initial_tools)}")
+
+# Step 2: Initialize LLM
+llm = OpenAI(model="gpt-4o-mini")
+
+
+# Step 3: Create Workflow
+workflow = FunctionAgent(
+    tools=initial_tools,
+    llm=llm,
+    system_prompt="You are an agent that can perform basic mathematical operations using tools.",
+)
+
+from test import setup_combined_agent
+
+workflow_agent, index, file_tools = setup_combined_agent()
+
 
 class Assistant(Agent):
     def __init__(self) -> None:
@@ -58,7 +93,7 @@ class Assistant(Agent):
     # all functions annotated with @function_tool will be passed to the LLM when this
     # agent is active
     @function_tool
-    async def query_info(self, context: RunContext, query: str):
+    async def LiveKit_local_tool(self, context: RunContext, query: str):
         """
         Use this tool to get the data from RAG model
 
@@ -66,10 +101,22 @@ class Assistant(Agent):
             query: The query to get the data for
         """
 
-        logger.info(f"Querying info for {query}")
-        query_engine = index.as_query_engine(use_async=True)
-        res = await query_engine.aquery(query)
-        return str(res)
+        try:
+            print("\n--- Testing Workflow Agent ---")
+            response = await workflow.run(query)
+            return str(response)
+
+        except Exception as e:
+            print(f"Error during workflow execution in LlamaIndex RAG tool")
+
+    @function_tool
+    async def Llamaindex_RAG_tool(self, context: RunContext, query: str):
+        try:
+            response = await workflow_agent.run(query)
+            print(f"Workflow Response: {response}")
+
+        except Exception as e:
+            print(f"Error during workflow execution: {e}")
 
 
 def prewarm(proc: JobProcess):
