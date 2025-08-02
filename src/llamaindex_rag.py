@@ -160,24 +160,28 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Option 1: Use FunctionAgent (workflow-based, async)
-    print("=== Setting up FunctionAgent (Workflow) ===")
+    logger.info("=== Setting up FunctionAgent (Workflow) ===")
     workflow_agent, index, file_tools = setup_combined_agent()
 
-    print("\nAgent is ready! Available tools:")
+    logger.info(f"Workflow Agent: {workflow_agent}")
+    logger.info(f"Index: {index}")
+    logger.info(f"File Tools: {file_tools}")
+
+    logger.info("\nAgent is ready! Available tools:")
     for tool in workflow_agent.tools:
-        print(f"- {tool.metadata.name}: {tool.metadata.description}")
+        logger.info(f"- {tool.metadata.name}: {tool.metadata.description}")
 
     # Example queries using the workflow agent (async)
     async def run_workflow_examples():
         try:
-            print("\n--- Testing Workflow Agent ---")
+            logger.info("\n--- Testing Workflow Agent ---")
             response = await workflow_agent.run(
-                "Find specific information about 5 benchmark names and percentage in document in metagpt paper."
+                "Compare longlora, selfrag and metagpt papers and bring out the key differences and similarities."
             )
-            print(f"Workflow Response: {response}")
+            logger.info(f"Workflow Response: {response}")
 
         except Exception as e:
-            print(f"Error during workflow execution: {e}")
+            logger.info(f"Error during workflow execution: {e}")
 
     # Uncomment to run workflow examples
     asyncio.run(run_workflow_examples())

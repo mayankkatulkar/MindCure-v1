@@ -58,7 +58,7 @@ export const StreamingTextPanel = ({ messages, className }: StreamingTextPanelPr
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex items-center gap-2">
                     <span className="foreground text-sm font-medium">
-                      {message.from?.isLocal ? 'You' : 'Agent'}
+                      {message.from?.isLocal ? 'You' : 'Raphael'}
                     </span>
                     <span className="text-muted-foreground text-xs">
                       {new Date(message.timestamp).toLocaleTimeString()}

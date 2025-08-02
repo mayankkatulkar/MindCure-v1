@@ -65,7 +65,7 @@ class Assistant(Agent):
     @function_tool
     async def Llamaindex_RAG_tool(self, context: RunContext, query: str):
         """
-        Use this tool to get the data from LlamaIndex RAG model when deep reasoning is needed.
+        Only use this tool when deep reasoning is needed.
 
         Args:
             query: The query to get the data for
@@ -94,14 +94,11 @@ async def entrypoint(ctx: JobContext):
     # Create session with the LLM, STT, TTS, turn detection, and VAD
     session = AgentSession(
         llm=openai.LLM(model="gpt-4o-mini"),
-        # Speech-to-text (STT) is your agent's ears, turning the user's speech into text that the LLM can understand
-        # See all providers at https://docs.livekit.io/agents/integrations/stt/
         stt=deepgram.STT(model="nova-3", language="multi"),
-        # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
-        # See all providers at https://docs.livekit.io/agents/integrations/tts/
         tts=cartesia.TTS(voice="6f84f4b8-58a2-430c-8c79-688dad597532"),
         turn_detection=EnglishModel(),
         vad=ctx.proc.userdata["vad"],
+        min_interruption_words=2,
     )
 
     # Log metrics as they are emitted, and total usage after session is over

@@ -109,3 +109,110 @@ This project is production-ready and includes a working `Dockerfile`. To deploy 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+# Backend Documentation
+
+## File Upload System
+
+The application now includes a file upload system that allows users to upload documents to the `src/data` folder. This enables the RAG (Retrieval-Augmented Generation) system to work with user-provided documents.
+
+### Supported File Types
+- PDF files (.pdf)
+- Microsoft Word documents (.doc, .docx)
+- Text files (.txt)
+- CSV files (.csv)
+- Excel files (.xls, .xlsx)
+
+### File Size Limits
+- Maximum file size: 50MB per file
+
+### API Endpoints
+
+#### POST /api/upload
+Uploads a file to the `src/data` folder.
+
+**Request:**
+- Content-Type: `multipart/form-data`
+- Body: Form data with a `file` field containing the file to upload
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "File uploaded successfully",
+  "fileName": "document_1234567890.pdf",
+  "originalName": "document.pdf",
+  "size": 1024000,
+  "type": "application/pdf"
+}
+```
+
+#### GET /api/upload
+Retrieves a list of all uploaded files and statistics.
+
+**Response:**
+```json
+{
+  "files": [
+    {
+      "name": "document_1234567890.pdf",
+      "size": 1024000,
+      "modified": "2024-01-01T12:00:00.000Z",
+      "isDirectory": false
+    }
+  ],
+  "totalFiles": 1,
+  "totalSize": 1024000
+}
+```
+
+#### DELETE /api/upload
+Deletes all files from the `src/data` folder.
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "All files deleted successfully"
+}
+```
+
+### Frontend Integration
+
+The file upload system is integrated into the frontend with the following components:
+
+1. **Upload Component** (`frontend/components/upload/Upload.tsx`)
+   - Drag and drop file upload interface
+   - File type validation
+   - Upload progress indication
+   - Real-time file list display
+
+2. **Stats Component** (`frontend/components/upload/Stats.tsx`)
+   - Displays total number of files
+   - Shows total file size
+   - Shows latest upload date
+
+3. **Clear Component** (`frontend/components/upload/Clear.tsx`)
+   - Allows users to delete all uploaded files
+   - Confirmation dialog before deletion
+
+### File Storage
+
+Uploaded files are stored in the `src/data` folder with the following naming convention:
+- Original filename with timestamp suffix to prevent conflicts
+- Example: `document.pdf` becomes `document_1234567890.pdf`
+
+### Security Considerations
+
+- File type validation prevents malicious file uploads
+- File size limits prevent abuse
+- Files are stored in a controlled directory structure
+- No direct file execution is allowed
+
+### Integration with RAG System
+
+The uploaded files in the `src/data` folder can be used by the existing RAG (Retrieval-Augmented Generation) system:
+
+- Files are automatically available for document processing
+- The existing `llamaindex_rag.py` and `livekit_rag.py` modules can access these files
+- The agent can reference and query the uploaded documents during conversations

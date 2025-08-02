@@ -44,7 +44,7 @@ async def test_offers_assistance() -> None:
 
 @pytest.mark.asyncio
 async def test_weather_tool() -> None:
-    """Unit test for the weather tool combined with an evaluation of the agent's ability to incorporate its results."""
+    """Unit test for the RAG tool combined with an evaluation of the agent's ability to incorporate its results."""
     async with (
         _llm() as llm,
         AgentSession(llm=llm) as session,
@@ -54,15 +54,15 @@ async def test_weather_tool() -> None:
         # Run an agent turn following the user's request for weather information
         result = await session.run(user_input="What's the weather in Tokyo?")
 
-        # Test that the agent calls the weather tool with the correct arguments
+        # Test that the agent calls the RAG tool with the correct arguments
         result.expect.next_event().is_function_call(
-            name="lookup_weather", arguments={"location": "Tokyo"}
+            name="LiveKit_RAG_tool", arguments={"query": "current weather in Tokyo"}
         )
 
         # Test that the tool invocation works and returns the correct output
         # To mock the tool output instead, see https://docs.livekit.io/agents/build/testing/#mock-tools
         result.expect.next_event().is_function_call_output(
-            output="sunny with a temperature of 70 degrees."
+            output="The current weather in Tokyo is not provided in the given context information."
         )
 
         # Evaluate the agent's response for accurate weather information
@@ -72,10 +72,11 @@ async def test_weather_tool() -> None:
             .judge(
                 llm,
                 intent="""
-                Informs the user that the weather is sunny with a temperature of 70 degrees.
+                Informs the user that weather information is not available in the current context.
 
                 Optional context that may or may not be included (but the response must not contradict these facts)
                 - The location for the weather report is Tokyo
+                - The agent should acknowledge that it doesn't have the weather information
                 """,
             )
         )
@@ -96,12 +97,12 @@ async def test_weather_unavailable() -> None:
         # Simulate a tool error
         with mock_tools(
             Assistant,
-            {"lookup_weather": lambda: RuntimeError("Weather service is unavailable")},
+            {"LiveKit_RAG_tool": lambda: RuntimeError("RAG service is unavailable")},
         ):
             result = await sess.run(user_input="What's the weather in Tokyo?")
             result.expect.skip_next_event_if(type="message", role="assistant")
             result.expect.next_event().is_function_call(
-                name="lookup_weather", arguments={"location": "Tokyo"}
+                name="LiveKit_RAG_tool", arguments={"query": "current weather in Tokyo"}
             )
             result.expect.next_event().is_function_call_output()
             await result.expect.next_event(type="message").judge(
@@ -131,7 +132,9 @@ async def test_unsupported_location() -> None:
     ):
         await sess.start(Assistant())
 
-        with mock_tools(Assistant, {"lookup_weather": lambda: "UNSUPPORTED_LOCATION"}):
+        with mock_tools(
+            Assistant, {"LiveKit_RAG_tool": lambda: "UNSUPPORTED_LOCATION"}
+        ):
             result = await sess.run(user_input="What's the weather in Tokyo?")
 
             # Evaluate the agent's response for an unsupported location
