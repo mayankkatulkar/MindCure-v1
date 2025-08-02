@@ -1,5 +1,6 @@
 import logging
 
+from anyio import Path
 from dotenv import load_dotenv
 from livekit.agents import (
     Agent,
@@ -19,14 +20,6 @@ from livekit.agents import (
     AutoSubscribe,
 )
 
-from llama_index.core import (
-    SimpleDirectoryReader,
-    StorageContext,
-    VectorStoreIndex,
-    load_index_from_storage,
-)
-from pathlib import Path
-
 
 from prompts import AGENT_INSTRUCTIONS, SESSION_INSTRUCTIONS
 from livekit.agents.llm import function_tool
@@ -36,54 +29,13 @@ logger = logging.getLogger("agent")
 
 load_dotenv(".env.local")
 
-# check if storage already exists
-THIS_DIR = Path(__file__).parent
-PERSIST_DIR = THIS_DIR / "query-engine-storage"
-if not PERSIST_DIR.exists():
-    # load the documents and create the index
-    documents = SimpleDirectoryReader(THIS_DIR / "data").load_data()
-    index = VectorStoreIndex.from_documents(documents)
-    # store it for later
-    index.storage_context.persist(persist_dir=PERSIST_DIR)
-else:
-    # load the existing index
-    storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
-    index = load_index_from_storage(storage_context)
-
-#
-
-from utils import get_doc_tools
-from pathlib import Path
-from llama_index.llms.openai import OpenAI
-from llama_index.core.agent.workflow import FunctionAgent
-
-# Step 1: Load tools from files
-file_to_tools_dict = {}
-for file in Path("src/data").iterdir():
-    logger.warning(f"Getting tools for file: {file}")
-    vector_tool, summary_tool = get_doc_tools(file, Path(file).stem)
-    file_to_tools_dict[file] = [vector_tool, summary_tool]
-
-initial_tools = [
-    t for file in Path("src/data").iterdir() for t in file_to_tools_dict[file]
-]
-
-logger.warning(f"Number of tools: {len(initial_tools)}")
-
-# Step 2: Initialize LLM
-llm = OpenAI(model="gpt-4o-mini")
-
-
-# Step 3: Create Workflow
-workflow = FunctionAgent(
-    tools=initial_tools,
-    llm=llm,
-    system_prompt="You are an agent that can perform basic mathematical operations using tools.",
-)
-
-from test import setup_combined_agent
+# Imports for RAG with LlamaIndex
+from llamaindex_rag import setup_combined_agent
 
 workflow_agent, index, file_tools = setup_combined_agent()
+
+# Imports for RAG with Livekit
+from livekit_rag import livekit_rag
 
 
 class Assistant(Agent):
@@ -92,31 +44,40 @@ class Assistant(Agent):
 
     # all functions annotated with @function_tool will be passed to the LLM when this
     # agent is active
+
     @function_tool
-    async def LiveKit_local_tool(self, context: RunContext, query: str):
+    async def LiveKit_RAG_tool(self, context: RunContext, query: str):
         """
-        Use this tool to get the data from RAG model
+        Use this tool to get the data quickly from Livekit RAG model
 
         Args:
             query: The query to get the data for
         """
 
         try:
-            print("\n--- Testing Workflow Agent ---")
-            response = await workflow.run(query)
+            response = await livekit_rag(query)
+            logger.info(f"Livekit RAG Response: {response}")
             return str(response)
 
         except Exception as e:
-            print(f"Error during workflow execution in LlamaIndex RAG tool")
+            logger.error(f"Error during workflow execution in LlamaIndex RAG tool")
 
     @function_tool
     async def Llamaindex_RAG_tool(self, context: RunContext, query: str):
+        """
+        Use this tool to get the data from LlamaIndex RAG model when deep reasoning is needed.
+
+        Args:
+            query: The query to get the data for
+        """
+
         try:
             response = await workflow_agent.run(query)
-            print(f"Workflow Response: {response}")
+            logger.info(f"Workflow Response: {response}")
+            return str(response)
 
         except Exception as e:
-            print(f"Error during workflow execution: {e}")
+            logger.error(f"Error during workflow execution: {e}")
 
 
 def prewarm(proc: JobProcess):
