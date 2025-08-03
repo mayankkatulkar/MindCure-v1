@@ -5,7 +5,7 @@ services:
     build:
       context: .
     ports:
-      - "3000:80"  # or "5173:5173" for dev server
+      - "3000:3000"  # or "5173:5173" for dev server
     env_file:
       - .env.local
     container_name: voice-frontend

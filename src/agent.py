@@ -27,13 +27,13 @@ logger = logging.getLogger("agent")
 
 load_dotenv(".env.local")
 
+# Imports for RAG with Livekit
+from livekit_rag import livekit_rag
+
 # Imports for RAG with LlamaIndex
 from llamaindex_rag import setup_combined_agent
 
 workflow_agent, index, file_tools = setup_combined_agent()
-
-# Imports for RAG with Livekit
-from livekit_rag import livekit_rag
 
 
 class Assistant(Agent):
