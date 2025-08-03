@@ -16,6 +16,16 @@ load_dotenv("../.env.local")
 # check if storage already exists
 THIS_DIR = Path(__file__).parent
 PERSIST_DIR = THIS_DIR / "query-engine-storage"
+
+
+# check if data directory exists
+if not (THIS_DIR / "data").exists():
+    logger.error("Data directory does not exist")
+
+    # create empty data directory
+    (THIS_DIR / "data").mkdir(parents=True, exist_ok=True)
+
+
 if not PERSIST_DIR.exists():
     # load the documents and create the index
     documents = SimpleDirectoryReader(THIS_DIR / "data").load_data()
