@@ -1,13 +1,24 @@
-Changed turn detection from turn_detection=MultilingualModel() to turn_detection=EnglishModel() to improve Per Turn Latency and reduce size on disk 
+# Improvements and Implementation Notes
 
-Auto join the room with audio
-await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
+## Turn Detection Optimization
+- **Switched to English-Only Model:** Updated turn detection from `MultilingualModel()` to `EnglishModel()` to significantly reduce disk usage and improve per-turn latency.
 
-Greet user with welcome message and what can be helped with.
+## Auto-Join Room with Audio
+- **Automatic Audio Subscription:** The agent now automatically joins the room with audio-only mode enabled:
+  ```python
+  await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
+  ```
 
-Tried 3 hrs to ensure there is a KEYBOARD_TYPING audio while thinking, was not ab;e to make it work.
-Even the gihub repo they have doesn't make the typing sound where they demo how to use it  https://github.com/livekit/agents/blob/main/examples/voice_agents/background_audio.py
+## Enhanced User Experience
+- **Welcome Message:** Users are now greeted with a welcome message that also outlines the agent’s capabilities and how it can assist.
 
-Created 2 RAG models:
-One with Direct tool call with RAG from livekit for quick tasks
-Second with RAG tool to multi agent architecture from llamaindex, think of this as RAG model having access to internal tools and tasks which need deep reasoning.
+## Typing Sound Feedback (Unresolved)
+- **Keyboard Typing Audio:** Spent several hours attempting to implement a "keyboard typing" background audio effect while the agent is processing/thinking. Despite efforts and referencing the [LiveKit example](https://github.com/livekit/agents/blob/main/examples/voice_agents/background_audio.py), this feature could not be made to work as intended.
+
+## RAG Model Architecture
+- **Dual RAG Systems:**
+  - **Direct RAG:** Integrated a direct tool-call RAG model using LiveKit for fast, straightforward tasks.
+  - **Multi-Agent RAG:** Added a more advanced RAG system leveraging LlamaIndex, enabling the agent to access internal tools and perform complex, reasoning-intensive tasks.
+
+## Personality and Greetings
+- **Custom Prompts:** Added personality traits and greeting messages to the agent’s prompt configuration in `src/prompts.py` for a more engaging and personalized user interaction.

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 const tabs = [
   { name: 'SwipeSmart', href: '/', current: true },
   { name: 'File Upload', href: '/file-upload', current: false },
+  { name: 'Call Traces', href: '/call-traces', current: false },
 ];
 
 function classNames(...classes: string[]) {
