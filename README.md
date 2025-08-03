@@ -1,254 +1,185 @@
-# Open LlamaKit Template
-## Open Source Voice AI Testing Framework using LiveKit and Llamaindex
+# 🎤 Voice AI Agent Starter - Complete Documentation
 
-A complete starter project for building voice AI applications with [LiveKit Agents for Python](https://github.com/livekit/agents), featuring advanced RAG (Retrieval-Augmented Generation) capabilities and a modern web frontend.
+A comprehensive voice AI application built with LiveKit Agents, featuring real-time voice interaction, advanced RAG capabilities, file management, and a modern web frontend.
 
-## 🚀 Features
-
-### Backend (Python)
-- **Voice AI Assistant**: Real-time voice interaction with OpenAI, Cartesia TTS, and Deepgram STT
-- **Advanced RAG System**: Dual RAG architecture for different use cases:
-  - **Direct RAG**: Quick tasks with LiveKit RAG integration
-  - **Multi-Agent RAG**: Complex reasoning tasks using LlamaIndex with internal tools
-- **File Upload System**: Upload and process documents (PDF, Word, Excel, CSV, TXT)
-- **Turn Detection**: Contextually-aware speaker detection with English model optimization
-- **Noise Cancellation**: LiveKit Cloud enhanced noise cancellation
-- **Auto-join**: Automatic room connection with audio-only subscription
-- **Welcome Messages**: Greeting system with capability descriptions
-
-### Frontend (Next.js)
-- **Real-time Voice Interface**: LiveKit JavaScript SDK integration
-- **File Management**: Drag-and-drop file upload with progress tracking
-- **Call Traces**: Debug and monitor agent interactions
-- **Modern UI**: Light/dark theme with customizable branding
-- **Video Support**: Camera streaming and screen sharing capabilities
-- **Virtual Avatars**: Avatar integration for enhanced user experience
-
-## 📁 Project Structure
+## 📚 Documentation Tree
 
 ```
-agent-starter-python/
-├── src/                          # Python backend
-│   ├── agent.py                  # Main agent implementation
-│   ├── livekit_rag.py           # Direct RAG integration
-│   ├── llamaindex_rag.py        # Multi-agent RAG system
-│   ├── recreate_rag.py          # RAG system recreation
-│   ├── prompts.py               # Agent prompts
-│   ├── utils.py                 # Utility functions
-│   └── data/                    # Uploaded documents storage
-├── frontend/                     # Next.js web application
-│   ├── app/                     # Next.js app directory
-│   ├── components/              # React components
-│   │   ├── livekit/            # LiveKit-specific components
-│   │   ├── upload/             # File upload components
-│   │   └── call-traces/        # Call tracing components
-│   └── public/                 # Static assets
-├── tests/                       # Test suite
-└── Dockerfile                   # Production deployment
+📁 Project Documentation
+├── 📄 [README.md](./README.md) (This file) - Main project overview & quick start
+├── 📄 [DOCUMENTATION.md](./DOCUMENTATION.md) - Complete documentation index & navigation
+├── 📄 [FILE_STRUCTURE.md](./FILE_STRUCTURE.md) - Complete file structure guide
+├── 📄 [README_backend.md](./README_backend.md) - Backend Python implementation details
+├── 📄 [frontend/README.md](./frontend/README.md) - Frontend Next.js application guide
+├── 📄 [IMPROVEMENTS.md](./IMPROVEMENTS.md) - Recent improvements & implementation notes
+└── 📄 [LICENSE](./LICENSE) - MIT License
 ```
 
-## 🛠️ Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.9+
 - Node.js 18+
 - LiveKit Cloud account or self-hosted LiveKit server
 
-### Backend Setup
-
-1. **Clone and install dependencies:**
-   ```bash
-   git clone <repository-url>
-   cd agent-starter-python
-   uv sync
-   ```
-
-2. **Configure environment variables:**
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Fill in the required values:
-   ```env
-   LIVEKIT_URL=your_livekit_url
-   LIVEKIT_API_KEY=your_api_key
-   LIVEKIT_API_SECRET=your_api_secret
-   OPENAI_API_KEY=your_openai_key
-   DEEPGRAM_API_KEY=your_deepgram_key
-   CARTESIA_API_KEY=your_cartesia_key
-   ```
-
-3. **Download required models:**
-   ```bash
-   uv run python src/agent.py download-files
-   ```
-
-4. **Run the agent:**
-   ```bash
-   # Console mode (terminal interaction)
-   uv run python src/agent.py console
-   
-   # Development mode (for frontend/telephony)
-   uv run python src/agent.py dev
-   
-   # Production mode
-   uv run python src/agent.py start
-   ```
-
-### Frontend Setup
-
-1. **Install dependencies:**
-   ```bash
-   cd frontend
-   pnpm install
-   ```
-
-2. **Configure environment:**
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Add your LiveKit credentials:
-   ```env
-   LIVEKIT_API_KEY=your_api_key
-   LIVEKIT_API_SECRET=your_api_secret
-   LIVEKIT_URL=your_livekit_url
-   ```
-
-3. **Start the development server:**
-   ```bash
-   pnpm dev
-   ```
-
-4. **Open your browser:**
-   Navigate to `http://localhost:3000`
-
-## 🔧 RAG System
-
-This project implements a sophisticated dual RAG architecture:
-
-### Direct RAG (livekit_rag.py)
-- **Purpose**: Quick, direct document queries
-- **Use Case**: Simple Q&A from uploaded documents
-- **Integration**: Direct LiveKit RAG tool integration
-
-### Multi-Agent RAG (llamaindex_rag.py)
-- **Purpose**: Complex reasoning and task execution
-- **Use Case**: Deep analysis, multi-step reasoning, tool usage
-- **Features**: 
-  - Internal tool access
-  - Multi-agent coordination
-  - Advanced reasoning capabilities
-
-## 📁 File Upload System
-
-### Supported Formats
-- PDF files (.pdf)
-- Microsoft Word (.doc, .docx)
-- Text files (.txt)
-- CSV files (.csv)
-- Excel files (.xls, .xlsx)
-
-### API Endpoints
-- `POST /api/upload` - Upload files
-- `GET /api/upload` - List uploaded files
-- `DELETE /api/upload` - Clear all files
-
-### Features
-- Drag-and-drop interface
-- File type validation
-- Size limits (50MB per file)
-- Progress tracking
-- Real-time file management
-
-## 🧪 Testing
-
-Run the complete test suite:
-
+### 1. Backend Setup
 ```bash
-uv run pytest
+# Clone and install dependencies
+git clone <repository-url>
+cd agent-starter-python
+uv sync
+
+# Configure environment
+cp .env.example .env.local
+# Fill in your API keys (see README_backend.md for details)
+
+# Download required models
+uv run python src/agent.py download-files
+
+# Start the agent
+uv run python src/agent.py dev
 ```
+
+### 2. Frontend Setup
+```bash
+# Install dependencies
+cd frontend
+pnpm install
+
+# Configure environment
+cp .env.example .env.local
+# Add your LiveKit credentials
+
+# Start development server
+pnpm dev
+```
+
+### 3. Access the Application
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+
+## 🏗️ Architecture Overview
+
+### Backend Components
+- **Voice AI Pipeline**: OpenAI LLM + Cartesia TTS + Deepgram STT
+- **Dual RAG System**: Direct RAG + Multi-Agent RAG with LlamaIndex
+- **File Upload System**: Document processing for RAG capabilities
+- **Turn Detection**: Contextually-aware speaker detection
+- **Noise Cancellation**: LiveKit Cloud enhanced audio processing
+
+### Frontend Components
+- **Real-time Voice Interface**: LiveKit JavaScript SDK integration
+- **File Management**: Drag-and-drop upload with progress tracking
+- **Call Traces**: Debug and monitor agent interactions
+- **Modern UI**: Light/dark theme with customizable branding
+- **Video Support**: Camera streaming and screen sharing
+
+## 📁 Project Structure
+
+```
+agent-starter-python/
+├── 📄 [README.md](./README.md)                    # Main documentation (this file)
+├── 📄 [README_backend.md](./README_backend.md)    # Backend implementation guide
+├── 📄 [IMPROVEMENTS.md](./IMPROVEMENTS.md)        # Recent improvements & notes
+├── 📄 [LICENSE](./LICENSE)                        # MIT License
+├── 📁 src/                                        # Python backend
+│   ├── agent.py                                   # Main agent implementation
+│   ├── livekit_rag.py                            # Direct RAG integration
+│   ├── llamaindex_rag.py                         # Multi-agent RAG system
+│   ├── recreate_rag.py                           # RAG system recreation
+│   ├── prompts.py                                # Agent prompts
+│   ├── utils.py                                  # Utility functions
+│   └── data/                                     # Uploaded documents storage
+├── 📁 frontend/                                   # Next.js web application
+│   ├── 📄 [README.md](./frontend/README.md)      # Frontend implementation guide
+│   ├── app/                                       # Next.js app directory
+│   ├── components/                                # React components
+│   │   ├── livekit/                              # LiveKit-specific components
+│   │   ├── upload/                               # File upload components
+│   │   └── call-traces/                          # Call tracing components
+│   └── public/                                   # Static assets
+├── 📁 tests/                                      # Test suite
+├── 📄 Dockerfile                                 # Production deployment
+└── 📄 docker-compose.yml                         # Docker configuration
+```
+
+## 🔧 Key Features
+
+### Voice AI Capabilities
+- **Real-time Voice Interaction**: Seamless conversation with AI agent
+- **Multi-language Support**: Turn detection optimized for English
+- **Noise Cancellation**: Enhanced audio quality with LiveKit Cloud
+- **Auto-join**: Automatic room connection with audio-only subscription
+
+### RAG (Retrieval-Augmented Generation)
+- **Dual Architecture**: 
+  - Direct RAG for quick tasks
+  - Multi-Agent RAG for complex reasoning
+- **File Upload System**: Support for PDF, Word, Excel, CSV, TXT
+- **Knowledge Base**: Dynamic document processing and querying
+
+### Development & Monitoring
+- **Call Traces**: Comprehensive debugging and analytics
+- **File Management**: Drag-and-drop interface with progress tracking
+- **Modern UI**: Responsive design with theme switching
+- **TypeScript**: Full type safety throughout frontend
+
+## 📖 Detailed Documentation
+
+### Backend Documentation
+📄 **[README_backend.md](./README_backend.md)**
+- Complete Python backend implementation guide
+- Voice AI pipeline configuration
+- RAG system architecture details
+- File upload system API documentation
+- Deployment and production setup
+
+### Frontend Documentation
+📄 **[frontend/README.md](./frontend/README.md)**
+- Next.js application implementation
+- LiveKit integration guide
+- Component architecture and structure
+- Configuration and customization options
+- Development and deployment instructions
+
+### Recent Improvements
+📄 **[IMPROVEMENTS.md](./IMPROVEMENTS.md)**
+- Turn detection optimization
+- Auto-join room implementation
+- Welcome message system
+- Dual RAG architecture details
+- Implementation notes and unresolved features
 
 ## 🚀 Deployment
 
 ### Docker Deployment
-The project includes a production-ready Dockerfile:
-
-Testing Locally
 ```bash
+# Build and run with Docker
 docker build -t voice-agent .
 docker compose up
-```
-
-### Deploying to AWS cloud using AWS cli
-```bash
-brew install aws/tap/copilot-cli  # macOS
-# or use curl for Linux: https://docs.aws.amazon.com/copilot/latest/userguide/getting-started-install.html
-```
-
-Create a init project for copilet
-```bash
-copilot init
-```
-```bash
-
-select type: "Worker Service"
-```
-Navigate to manifest file
-```bash
-cd copilot/your-project-name/manifest.yml
-```
-Add env variables for it to built the image and deploy
-```bash
-type: "Worker Service"
-
-# other configs ...
-
-env:
-  variables:
-    OPENAI_API_KEY: "your-openai-api-key"
-    LIVEKIT_API_KEY: "your-livekit-api-key"
-    LIVEKIT_API_SECRET: "your-livekit-api-secret"
-    LIVEKIT_URL: "your-livekit-url"
-    DEEPGRAM_API_KEY: "your-deepgram-api-key"
-    CARTESIA_API_KEY: "your-cartesia-api-key"
-
 ```
 
 ### LiveKit Cloud
 Deploy directly to LiveKit Cloud using the provided configuration files.
 
-## 🔧 Configuration
-
-### Backend Configuration
-Customize agent behavior in `src/prompts.py` and `src/agent.py`.
-
-### Frontend Configuration
-Modify `frontend/app-config.ts` for branding and feature customization:
-
-```typescript
-export const APP_CONFIG_DEFAULTS = {
-  companyName: 'Your Company',
-  pageTitle: 'Your Voice Assistant',
-  supportsChatInput: true,
-  supportsVideoInput: true,
-  // ... more options
-};
+### AWS Deployment
+Use AWS Copilot for cloud deployment:
+```bash
+copilot init
+# Select "Worker Service" type
+# Configure environment variables in manifest.yml
 ```
 
-## 📊 Monitoring
+## 🧪 Testing
 
-### Call Traces
-- Real-time call monitoring
-- Debug agent interactions
-- Performance metrics
-- Error tracking
+```bash
+# Run backend tests
+uv run pytest
 
-### Metrics
-- Turn detection latency
-- Response times
-- File processing statistics
-- RAG query performance
+# Run frontend tests
+cd frontend
+pnpm test
+```
 
 ## 🤝 Contributing
 
@@ -260,7 +191,7 @@ export const APP_CONFIG_DEFAULTS = {
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ## 🆘 Support
 
@@ -268,11 +199,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [LiveKit Community Slack](https://livekit.io/join-slack)
 - [GitHub Issues](https://github.com/your-repo/issues)
 
-## 🔄 Recent Improvements
+---
 
-- Optimized turn detection for better latency
-- Auto-join room with audio-only subscription
-- Welcome message system
-- Dual RAG architecture implementation
-- Enhanced file upload system
-- Improved error handling and logging 
+**Quick Links:**
+- [📋 Documentation Index](./DOCUMENTATION.md) - Complete documentation navigation
+- [📁 File Structure Guide](./FILE_STRUCTURE.md) - Detailed file organization
+- [🐍 Backend Guide](./README_backend.md) - Python implementation details
+- [⚛️ Frontend Guide](./frontend/README.md) - Next.js application guide
+- [🔄 Recent Improvements](./IMPROVEMENTS.md) - Latest updates and notes 
