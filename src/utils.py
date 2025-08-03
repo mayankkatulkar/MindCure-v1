@@ -45,8 +45,15 @@ def get_doc_tools(
         response = query_engine.query(query)
         return response
 
+    # Create a shorter, sanitized name for the tool
+    # Remove special characters and limit length to ensure it fits within 64 chars
+    sanitized_name = "".join(c for c in name if c.isalnum() or c in (" ", "-", "_"))[
+        :30
+    ]
+    sanitized_name = sanitized_name.replace(" ", "_").lower()
+
     vector_query_tool = FunctionTool.from_defaults(
-        name=f"vector_tool_{name}", fn=vector_query
+        name=f"vector_{sanitized_name}", fn=vector_query
     )
 
     summary_index = SummaryIndex(nodes)
@@ -55,7 +62,7 @@ def get_doc_tools(
         use_async=True,
     )
     summary_tool = QueryEngineTool.from_defaults(
-        name=f"summary_tool_{name}",
+        name=f"summary_{sanitized_name}",
         query_engine=summary_query_engine,
         description=(f"Useful for summarization questions related to {name}"),
     )

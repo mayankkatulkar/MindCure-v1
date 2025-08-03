@@ -25,6 +25,28 @@ def setup_persistent_index():
     """Set up or load the persistent vector index."""
     if not PERSIST_DIR.exists():
         logger.info("Creating new vector index...")
+
+        # Check if data directory exists and has files
+        if not DATA_DIR.exists():
+            logger.warning(
+                f"Data directory {DATA_DIR} does not exist. Creating empty index."
+            )
+            # Create an empty index
+            index = VectorStoreIndex.from_documents([])
+            index.storage_context.persist(persist_dir=PERSIST_DIR)
+            logger.info(f"Empty index created and persisted to {PERSIST_DIR}")
+            return index
+
+        # Check if data directory is empty
+        data_files = list(DATA_DIR.iterdir())
+        if not data_files:
+            logger.warning(f"Data directory {DATA_DIR} is empty. Creating empty index.")
+            # Create an empty index
+            index = VectorStoreIndex.from_documents([])
+            index.storage_context.persist(persist_dir=PERSIST_DIR)
+            logger.info(f"Empty index created and persisted to {PERSIST_DIR}")
+            return index
+
         # Load documents and create index
         documents = SimpleDirectoryReader(DATA_DIR).load_data()
         index = VectorStoreIndex.from_documents(documents)
@@ -47,6 +69,14 @@ def create_file_specific_tools():
 
     if not DATA_DIR.exists():
         logger.warning(f"Data directory {DATA_DIR} does not exist")
+        return {}, []
+
+    # Check if data directory is empty
+    data_files = list(DATA_DIR.iterdir())
+    if not data_files:
+        logger.warning(
+            f"Data directory {DATA_DIR} is empty. No file-specific tools will be created."
+        )
         return {}, []
 
     for file in DATA_DIR.iterdir():
@@ -137,6 +167,19 @@ def update_index_with_new_documents():
     # Load existing index
     storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
     index = load_index_from_storage(storage_context)
+
+    # Check if data directory exists and has files
+    if not DATA_DIR.exists():
+        logger.warning(
+            f"Data directory {DATA_DIR} does not exist. No documents to update."
+        )
+        return index
+
+    # Check if data directory is empty
+    data_files = list(DATA_DIR.iterdir())
+    if not data_files:
+        logger.warning(f"Data directory {DATA_DIR} is empty. No documents to update.")
+        return index
 
     # Load new documents
     documents = SimpleDirectoryReader(DATA_DIR).load_data()

@@ -5,6 +5,7 @@ import { Room, RoomEvent } from 'livekit-client';
 import { motion } from 'motion/react';
 import { RoomAudioRenderer, RoomContext, StartAudio } from '@livekit/components-react';
 import { toastAlert } from '@/components/alert-toast';
+import { useCallTraceContext } from '@/components/call-trace-provider';
 import { SessionView } from '@/components/session-view';
 import { Toaster } from '@/components/ui/sonner';
 import { Welcome } from '@/components/welcome';
@@ -22,9 +23,14 @@ export function App({ appConfig }: AppProps) {
   const room = useMemo(() => new Room(), []);
   const [sessionStarted, setSessionStarted] = useState(false);
   const { connectionDetails, refreshConnectionDetails } = useConnectionDetails();
+  const { startSession, endSession, isInRoomContext } = useCallTraceContext();
 
   useEffect(() => {
-    const onDisconnected = () => {
+    const onDisconnected = async () => {
+      // Save call trace when session ends
+      if (isInRoomContext) {
+        await endSession();
+      }
       setSessionStarted(false);
       refreshConnectionDetails();
     };
@@ -40,7 +46,7 @@ export function App({ appConfig }: AppProps) {
       room.off(RoomEvent.Disconnected, onDisconnected);
       room.off(RoomEvent.MediaDevicesError, onMediaDevicesError);
     };
-  }, [room, refreshConnectionDetails]);
+  }, [room, refreshConnectionDetails, endSession, isInRoomContext]);
 
   useEffect(() => {
     let aborted = false;
@@ -73,6 +79,13 @@ export function App({ appConfig }: AppProps) {
   }, [room, sessionStarted, connectionDetails, appConfig.isPreConnectBufferEnabled]);
 
   const { startButtonText } = appConfig;
+
+  // Start call trace session when session starts
+  useEffect(() => {
+    if (sessionStarted && isInRoomContext) {
+      startSession();
+    }
+  }, [sessionStarted, startSession, isInRoomContext]);
 
   return (
     <>

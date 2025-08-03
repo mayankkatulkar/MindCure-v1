@@ -61,7 +61,7 @@ RUN uv sync --locked
 # Pre-download any ML models or files the agent needs
 # This ensures the container is ready to run immediately without downloading
 # dependencies at runtime, which improves startup time and reliability
-RUN uv run src/agent.py download-files
+# RUN uv run src/agent.py download-files
 
 # Expose the healthcheck port
 # This allows Docker and orchestration systems to check if the container is healthy

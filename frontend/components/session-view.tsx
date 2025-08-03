@@ -9,13 +9,13 @@ import {
   useVoiceAssistant,
 } from '@livekit/components-react';
 import { toastAlert } from '@/components/alert-toast';
+import { useCallTraceContext } from '@/components/call-trace-provider';
 import { AgentControlBar } from '@/components/livekit/agent-control-bar/agent-control-bar';
 import { ChatEntry } from '@/components/livekit/chat/chat-entry';
 import { ChatMessageView } from '@/components/livekit/chat/chat-message-view';
 import { MediaTiles } from '@/components/livekit/media-tiles';
 import { StreamingTextPanel } from '@/components/streaming-text-panel';
 import useChatAndTranscription from '@/hooks/useChatAndTranscription';
-import { useDebugMode } from '@/hooks/useDebug';
 import type { AppConfig } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -39,9 +39,30 @@ export const SessionView = ({
   const [chatOpen, setChatOpen] = useState(false);
   const [streamingPanelOpen, setStreamingPanelOpen] = useState(true);
   const { messages, send } = useChatAndTranscription();
+  const { addMessage, endSession, isInRoomContext } = useCallTraceContext();
   const room = useRoomContext();
+  const lastProcessedMessageId = React.useRef<string | null>(null);
 
-  useDebugMode();
+  // Track messages for call traces
+  useEffect(() => {
+    if (sessionStarted && isInRoomContext && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+
+      if (lastMessage.id !== lastProcessedMessageId.current) {
+        addMessage(lastMessage);
+        lastProcessedMessageId.current = lastMessage.id;
+      }
+    }
+  }, [messages, sessionStarted, addMessage, isInRoomContext]);
+
+  // Cleanup: Save call trace when component unmounts or session ends
+  useEffect(() => {
+    return () => {
+      if (sessionStarted && isInRoomContext) {
+        endSession();
+      }
+    };
+  }, [sessionStarted, endSession, isInRoomContext]);
 
   async function handleSendMessage(message: string) {
     await send(message);
@@ -170,6 +191,7 @@ export const SessionView = ({
                 capabilities={capabilities}
                 onChatOpenChange={setChatOpen}
                 onSendMessage={handleSendMessage}
+                onDisconnect={endSession}
               />
             </div>
             {/* skrim */}

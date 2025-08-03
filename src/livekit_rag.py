@@ -10,7 +10,7 @@ import logging
 
 logger = logging.getLogger("livekit_rag")
 
-load_dotenv(".env.local")
+load_dotenv("../.env.local")
 
 # RAG with Livekit
 # check if storage already exists

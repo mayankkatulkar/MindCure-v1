@@ -12,3 +12,4 @@ KMS
 .ruff_cache
 src/query-engine-storage
 src/data
+copilot

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { AnimatePresence, motion } from 'motion/react';
 import { CallTraceCard } from './call-trace-card';
 import { CallTraceFilters } from './call-trace-filters';
@@ -10,7 +11,7 @@ export interface CallTrace {
   id: string;
   timestamp: Date;
   sessionId: string;
-  messageType: 'user' | 'agent' | 'system';
+  messageType: 'user' | 'agent' | 'system' | 'session';
   message: string;
   responseTime: number;
   tokenCount: number;
@@ -32,6 +33,18 @@ export interface CallTrace {
     transcriptionDelay?: number;
     toolUsed?: string;
     errorMessage?: string;
+    // Additional fields from test page
+    participantCount?: number;
+    messageCount?: number;
+    userMessageCount?: number;
+    agentMessageCount?: number;
+    messages?: Array<{
+      id: string;
+      timestamp: number;
+      message: string;
+      from: string;
+      isLocal: boolean;
+    }>;
   };
 }
 
@@ -53,7 +66,7 @@ export function CallTracesView() {
         const data = await response.json();
 
         if (data.success) {
-          const parsedTraces = data.traces.map((trace: any) => ({
+          const parsedTraces = data.traces.map((trace: CallTrace) => ({
             ...trace,
             timestamp: new Date(trace.timestamp),
           }));
@@ -148,10 +161,30 @@ export function CallTracesView() {
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <h1 className="mb-2 text-4xl font-bold text-slate-900 dark:text-white">Call Traces</h1>
-          <p className="text-slate-600 dark:text-slate-400">
-            Monitor and analyze conversation metrics and performance
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="mb-2 text-4xl font-bold text-slate-900 dark:text-white">
+                Call Traces
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400">
+                Monitor and analyze conversation metrics and performance
+              </p>
+            </div>
+            <Link
+              href="/test-call-traces"
+              className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-blue-700"
+            >
+              <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
+              Test API
+            </Link>
+          </div>
         </motion.div>
 
         {/* Stats Cards */}

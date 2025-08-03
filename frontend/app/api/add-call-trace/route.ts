@@ -4,6 +4,19 @@ import { addTrace } from '../get-call-traces/route';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    // If the body contains a complete trace (from session end), use it directly
+    if (body.id && body.sessionId && body.metadata) {
+      await addTrace(body);
+
+      return NextResponse.json({
+        success: true,
+        message: 'Call trace added successfully',
+        trace: body,
+      });
+    }
+
+    // Handle legacy format for backward compatibility
     const { message, messageType = 'user', status = 'success' } = body;
 
     // Create new trace

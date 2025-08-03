@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { AnimatePresence, motion } from 'motion/react';
 import { type ReceivedChatMessage } from '@livekit/components-react';
 import { cn } from '@/lib/utils';
@@ -50,7 +51,7 @@ export const StreamingTextPanel = ({ messages, className }: StreamingTextPanelPr
                 {/* Avatar/Indicator */}
                 <div className="bg-primary/20 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full">
                   <span className="primary text-xs font-medium">
-                    {message.from?.isLocal ? 'U' : 'A'}
+                    {message.from?.isLocal ? 'U' : 'R'}
                   </span>
                 </div>
 
@@ -65,7 +66,7 @@ export const StreamingTextPanel = ({ messages, className }: StreamingTextPanelPr
                     </span>
                   </div>
                   <div className="foreground text-sm leading-relaxed whitespace-pre-wrap">
-                    {message.message}
+                    <ReactMarkdown>{message.message}</ReactMarkdown>
                   </div>
                 </div>
               </div>

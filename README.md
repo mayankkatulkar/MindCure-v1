@@ -1,4 +1,5 @@
-# LiveKit Agents Starter - Python
+# Open LlamaKit Template
+## Open Source Voice AI Testing Framework using LiveKit and Llamaindex
 
 A complete starter project for building voice AI applications with [LiveKit Agents for Python](https://github.com/livekit/agents), featuring advanced RAG (Retrieval-Augmented Generation) capabilities and a modern web frontend.
 
@@ -173,9 +174,45 @@ uv run pytest
 ### Docker Deployment
 The project includes a production-ready Dockerfile:
 
+Testing Locally
 ```bash
-docker build -t agent-starter-python .
-docker run -p 8000:8000 agent-starter-python
+docker build -t voice-agent .
+docker compose up
+```
+
+### Deploying to AWS cloud using AWS cli
+```bash
+brew install aws/tap/copilot-cli  # macOS
+# or use curl for Linux: https://docs.aws.amazon.com/copilot/latest/userguide/getting-started-install.html
+```
+
+Create a init project for copilet
+```bash
+copilot init
+```
+```bash
+
+select type: "Worker Service"
+```
+Navigate to manifest file
+```bash
+cd copilot/your-project-name/manifest.yml
+```
+Add env variables for it to built the image and deploy
+```bash
+type: "Worker Service"
+
+# other configs ...
+
+env:
+  variables:
+    OPENAI_API_KEY: "your-openai-api-key"
+    LIVEKIT_API_KEY: "your-livekit-api-key"
+    LIVEKIT_API_SECRET: "your-livekit-api-secret"
+    LIVEKIT_URL: "your-livekit-url"
+    DEEPGRAM_API_KEY: "your-deepgram-api-key"
+    CARTESIA_API_KEY: "your-cartesia-api-key"
+
 ```
 
 ### LiveKit Cloud
