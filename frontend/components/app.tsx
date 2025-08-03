@@ -82,10 +82,19 @@ export function App({ appConfig }: AppProps) {
 
   // Start call trace session when session starts
   useEffect(() => {
-    if (sessionStarted && isInRoomContext) {
+    if (sessionStarted) {
       startSession();
     }
-  }, [sessionStarted, startSession, isInRoomContext]);
+  }, [sessionStarted, startSession]);
+
+  // End call trace session when session ends
+  useEffect(() => {
+    return () => {
+      if (sessionStarted) {
+        endSession();
+      }
+    };
+  }, [sessionStarted, endSession]);
 
   return (
     <>

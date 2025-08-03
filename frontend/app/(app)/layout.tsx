@@ -1,3 +1,4 @@
+import { CallTraceProvider } from '@/components/call-trace-provider';
 import HeaderTabs from '@/components/header-tabs';
 
 interface AppLayoutProps {
@@ -6,9 +7,9 @@ interface AppLayoutProps {
 
 export default async function AppLayout({ children }: AppLayoutProps) {
   return (
-    <>
+    <CallTraceProvider>
       <HeaderTabs />
       {children}
-    </>
+    </CallTraceProvider>
   );
 }

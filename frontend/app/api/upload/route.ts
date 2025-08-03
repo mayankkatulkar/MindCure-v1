@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from 'next/server';
 import { existsSync } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';

@@ -45,7 +45,7 @@ export const SessionView = ({
 
   // Track messages for call traces
   useEffect(() => {
-    if (sessionStarted && isInRoomContext && messages.length > 0) {
+    if (sessionStarted && messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
 
       if (lastMessage.id !== lastProcessedMessageId.current) {
@@ -53,16 +53,16 @@ export const SessionView = ({
         lastProcessedMessageId.current = lastMessage.id;
       }
     }
-  }, [messages, sessionStarted, addMessage, isInRoomContext]);
+  }, [messages, sessionStarted, addMessage]);
 
   // Cleanup: Save call trace when component unmounts or session ends
   useEffect(() => {
     return () => {
-      if (sessionStarted && isInRoomContext) {
+      if (sessionStarted) {
         endSession();
       }
     };
-  }, [sessionStarted, endSession, isInRoomContext]);
+  }, [sessionStarted, endSession]);
 
   async function handleSendMessage(message: string) {
     await send(message);

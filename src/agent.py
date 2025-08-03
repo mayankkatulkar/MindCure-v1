@@ -12,13 +12,11 @@ from livekit.agents import (
     WorkerOptions,
     cli,
     metrics,
+    AutoSubscribe,
 )
 from livekit.agents.voice import MetricsCollectedEvent
 from livekit.plugins import cartesia, deepgram, noise_cancellation, openai, silero
 from livekit.plugins.turn_detector.english import EnglishModel
-from livekit.agents import (
-    AutoSubscribe,
-)
 
 
 from prompts import AGENT_INSTRUCTIONS, SESSION_INSTRUCTIONS
@@ -36,7 +34,6 @@ workflow_agent, index, file_tools = setup_combined_agent()
 
 # Imports for RAG with Livekit
 from livekit_rag import livekit_rag
-
 
 
 class Assistant(Agent):

@@ -9,6 +9,17 @@ import type { AppConfig, SandboxConfig } from './types';
 export const CONFIG_ENDPOINT = process.env.NEXT_PUBLIC_APP_CONFIG_ENDPOINT;
 export const SANDBOX_ID = process.env.SANDBOX_ID;
 
+// Utility function to get backend URL with proper fallback
+export const getBackendUrl = (): string => {
+  // Use NEXT_PUBLIC_BACKEND_URL if available (for production)
+  if (process.env.NEXT_PUBLIC_BACKEND_URL) {
+    return process.env.NEXT_PUBLIC_BACKEND_URL;
+  }
+
+  // Fallback to localhost for development
+  return 'http://localhost:8000';
+};
+
 export const THEME_STORAGE_KEY = 'theme-mode';
 export const THEME_MEDIA_QUERY = '(prefers-color-scheme: dark)';
 

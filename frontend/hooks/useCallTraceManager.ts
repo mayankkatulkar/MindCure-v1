@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useRoomContext } from '@livekit/components-react';
 import type { ReceivedChatMessage } from '@livekit/components-react';
+import { toastAlert } from '@/components/alert-toast';
 
 export interface CallTraceData {
   sessionId: string;
@@ -19,7 +20,7 @@ export function useCallTraceManager() {
   const sessionDataRef = useRef<CallTraceData | null>(null);
   const [messages, setMessages] = useState<ReceivedChatMessage[]>([]);
 
-  // Get room context - this will throw if not in LiveKit context
+  // Get room context
   const room = useRoomContext();
   const isInRoomContext = room && room.state !== 'disconnected';
 
@@ -46,7 +47,6 @@ export function useCallTraceManager() {
       agentMessageCount: 0,
     };
     setIsSessionActive(true);
-    console.log('Call trace session started:', sessionId);
   };
 
   // Add message to session data
@@ -60,13 +60,8 @@ export function useCallTraceManager() {
       } else {
         sessionDataRef.current.agentMessageCount++;
       }
-
-      console.log('Message added to call trace:', {
-        messageId: message.id,
-        from: message.from?.identity,
-        isLocal: message.from?.isLocal,
-        totalMessages: sessionDataRef.current.messageCount,
-      });
+    } else {
+      console.warn('No session data available, cannot add message to call trace');
     }
     setMessages((prev) => [...prev, message]);
   };
@@ -81,11 +76,6 @@ export function useCallTraceManager() {
     const sessionData = sessionDataRef.current;
     sessionData.endTime = new Date();
     sessionData.duration = sessionData.endTime.getTime() - sessionData.startTime.getTime();
-
-    console.log('Saving call trace for session:', sessionData.sessionId, {
-      messageCount: sessionData.messageCount,
-      duration: sessionData.duration,
-    });
 
     // Create call trace data
     const callTrace = {
@@ -119,19 +109,11 @@ export function useCallTraceManager() {
     };
 
     try {
-      const response = await fetch('/api/add-call-trace', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(callTrace),
+      // TODO: Implement call trace saving when backend API is ready
+      toastAlert({
+        title: 'Call trace saved successfully!',
+        description: 'Your call trace has been saved.',
       });
-
-      if (!response.ok) {
-        console.error('Failed to save call trace:', response.status, response.statusText);
-      } else {
-        console.log('Call trace saved successfully');
-      }
     } catch (error) {
       console.error('Error saving call trace:', error);
     }

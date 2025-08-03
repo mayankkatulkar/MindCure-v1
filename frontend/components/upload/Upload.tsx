@@ -65,7 +65,6 @@ export default function Upload() {
 
   const handleFileUpload = useCallback(
     async (file: File) => {
-      console.log('Uploading file:', file.name, file.type, file.size);
       setIsUploading(true);
       setUploadStatus({ type: null, message: '' });
 
@@ -78,9 +77,7 @@ export default function Upload() {
           body: formData,
         });
 
-        console.log('Upload response status:', response.status);
         const result: FileUploadResponse = await response.json();
-        console.log('Upload response:', result);
 
         if (response.ok && result.success) {
           setUploadStatus({
@@ -114,10 +111,6 @@ export default function Upload() {
   const handleMultipleFileUpload = useCallback(
     async (selectedFiles: FileList) => {
       const filesArray = Array.from(selectedFiles);
-      console.log(
-        'Uploading multiple files:',
-        filesArray.map((f) => f.name)
-      );
 
       setIsUploading(true);
       setUploadProgress({ current: 0, total: filesArray.length, currentFileName: '' });
@@ -190,7 +183,7 @@ export default function Upload() {
   const handleFileSelect = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const selectedFiles = event.target.files;
-      console.log('Files selected:', selectedFiles);
+
       if (selectedFiles && selectedFiles.length > 0) {
         if (selectedFiles.length === 1) {
           handleFileUpload(selectedFiles[0]);
@@ -207,7 +200,6 @@ export default function Upload() {
   );
 
   const handleButtonClick = useCallback(() => {
-    console.log('Button clicked, triggering file input');
     fileInputRef.current?.click();
   }, []);
 
@@ -215,7 +207,7 @@ export default function Upload() {
     (event: React.DragEvent) => {
       event.preventDefault();
       const droppedFiles = event.dataTransfer.files;
-      console.log('Files dropped:', droppedFiles);
+
       if (droppedFiles && droppedFiles.length > 0) {
         if (droppedFiles.length === 1) {
           handleFileUpload(droppedFiles[0]);

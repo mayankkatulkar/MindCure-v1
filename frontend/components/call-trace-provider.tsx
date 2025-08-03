@@ -39,24 +39,21 @@ interface CallTraceProviderProps {
 }
 
 export function CallTraceProvider({ children }: CallTraceProviderProps) {
-  // Only use the hook if we're in a LiveKit context
+  // Always use the call trace manager, even if room is not connected
   let callTraceManager;
 
   try {
-    const room = useRoomContext();
-    if (room && room.state !== 'disconnected') {
-      callTraceManager = useCallTraceManager();
-    }
+    callTraceManager = useCallTraceManager();
   } catch (error) {
-    console.warn('Not in LiveKit context, call traces disabled, error:', error);
+    console.warn('Could not initialize call trace manager, error:', error);
   }
 
   const value = callTraceManager || {
     isSessionActive: false,
     messages: [],
-    startSession: () => console.log('Call trace not available outside LiveKit context'),
-    endSession: async () => console.log('Call trace not available outside LiveKit context'),
-    addMessage: () => console.log('Call trace not available outside LiveKit context'),
+    startSession: () => console.log('Call trace not available'),
+    endSession: async () => console.log('Call trace not available'),
+    addMessage: () => console.log('Call trace not available'),
     isInRoomContext: false,
   };
 
