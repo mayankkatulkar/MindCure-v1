@@ -41,7 +41,7 @@ export default function Stats() {
         } else {
           setError('Failed to fetch file statistics');
         }
-      } catch (err) {
+      } catch {
         setError('Failed to fetch file statistics');
       } finally {
         setLoading(false);

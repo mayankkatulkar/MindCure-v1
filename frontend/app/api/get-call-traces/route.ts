@@ -208,33 +208,3 @@ export async function GET() {
     );
   }
 }
-
-// Helper function to get traces (for other API endpoints)
-export async function getTraces() {
-  try {
-    const tracesData = await fs.readFile(TRACES_FILE, 'utf-8');
-    return JSON.parse(tracesData);
-  } catch {
-    return [];
-  }
-}
-
-// Helper function to add traces (for other API endpoints)
-export async function addTrace(trace: any) {
-  try {
-    const traces = await getTraces();
-    traces.unshift(trace);
-    await fs.writeFile(TRACES_FILE, JSON.stringify(traces, null, 2));
-  } catch (error) {
-    console.error('Error adding trace:', error);
-  }
-}
-
-// Helper function to clear traces (for other API endpoints)
-export async function clearTraces() {
-  try {
-    await fs.writeFile(TRACES_FILE, JSON.stringify([], null, 2));
-  } catch (error) {
-    console.error('Error clearing traces:', error);
-  }
-}

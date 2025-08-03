@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { clearTraces } from '../get-call-traces/route';
+import { clearTraces } from '../call-traces-utils';
 
 export async function POST() {
   try {

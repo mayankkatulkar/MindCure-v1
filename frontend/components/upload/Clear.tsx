@@ -28,7 +28,7 @@ export default function Clear() {
         } else {
           alert('Failed to clear files. Please try again.');
         }
-      } catch (error) {
+      } catch {
         alert('Failed to clear files. Please try again.');
       } finally {
         setIsClearing(false);

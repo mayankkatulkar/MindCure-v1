@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/rules-of-hooks */
 'use client';
 
 import React, { ReactNode, createContext, useContext } from 'react';
 import { useRoomContext } from '@livekit/components-react';
 import { useCallTraceManager } from '@/hooks/useCallTraceManager';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/rules-of-hooks */
 
 export interface CallTraceContextType {
   isSessionActive: boolean;

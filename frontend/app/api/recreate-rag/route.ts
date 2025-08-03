@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { spawn } from 'child_process';
 import { join } from 'path';
 
-export async function POST() {
+export async function POST(): Promise<NextResponse> {
   try {
     console.log('Starting RAG recreation process...');
 
@@ -10,7 +10,7 @@ export async function POST() {
     const scriptPath = join(process.cwd(), '..', 'src', 'recreate_rag.py');
     const venvPython = join(process.cwd(), '..', '.venv', 'bin', 'python');
 
-    return new Promise((resolve) => {
+    return new Promise<NextResponse>((resolve) => {
       // Spawn Python process using virtual environment
       const pythonProcess = spawn(venvPython, [scriptPath], {
         cwd: join(process.cwd(), '..', 'src'),

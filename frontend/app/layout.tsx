@@ -1,13 +1,24 @@
-import { Public_Sans } from 'next/font/google';
 import localFont from 'next/font/local';
 import { headers } from 'next/headers';
 import { ApplyThemeScript, ThemeToggle } from '@/components/theme-toggle';
 import { getAppConfig } from '@/lib/utils';
 import './globals.css';
 
-const publicSans = Public_Sans({
+const publicSans = localFont({
+  src: [
+    {
+      path: '../public/font/Public_Sans/PublicSans-VariableFont_wght.ttf',
+      weight: '100 900',
+      style: 'normal',
+    },
+    {
+      path: '../public/font/Public_Sans/PublicSans-Italic-VariableFont_wght.ttf',
+      weight: '100 900',
+      style: 'italic',
+    },
+  ],
   variable: '--font-public-sans',
-  subsets: ['latin'],
+  display: 'swap',
 });
 
 const commitMono = localFont({
