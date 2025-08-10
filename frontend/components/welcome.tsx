@@ -1,15 +1,18 @@
 import { Button } from '@/components/ui/button';
+import { GenZToggle } from '@/components/genz-toggle';
 
 interface WelcomeProps {
   disabled: boolean;
   startButtonText: string;
   onStartCall: () => void;
+  onGenZModeChange?: (isGenZ: boolean) => void;
 }
 
 export const Welcome = ({
   disabled,
   startButtonText,
   onStartCall,
+  onGenZModeChange,
   ref,
 }: React.ComponentProps<'div'> & WelcomeProps) => {
   return (
@@ -18,6 +21,12 @@ export const Welcome = ({
       inert={disabled}
       className="fixed inset-0 z-10 mx-auto flex h-svh flex-col items-center justify-center text-center"
     >
+      {/* Gen-Z Mode Toggle in top right */}
+      <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
+        <span className="text-xs text-fg1 font-medium">Communication Style</span>
+        <GenZToggle onModeChange={onGenZModeChange} />
+      </div>
+
       <svg
         width="64"
         height="64"
@@ -33,7 +42,7 @@ export const Welcome = ({
       </svg>
 
       <p className="text-fg1 max-w-prose pt-1 leading-6 font-medium">
-        Chat live with your voice AI agent
+        Chat live with Dr. Sarah, your AI mental health therapist
       </p>
       <Button variant="primary" size="lg" onClick={onStartCall} className="mt-6 w-64 font-mono">
         {startButtonText}

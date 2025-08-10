@@ -22,6 +22,7 @@ interface AppProps {
 export function App({ appConfig }: AppProps) {
   const room = useMemo(() => new Room(), []);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [genZMode, setGenZMode] = useState(false);
   const { connectionDetails, refreshConnectionDetails } = useConnectionDetails();
   const { startSession, endSession, isInRoomContext } = useCallTraceContext();
 
@@ -56,7 +57,11 @@ export function App({ appConfig }: AppProps) {
           preConnectBuffer: appConfig.isPreConnectBufferEnabled,
         }),
         room.connect(connectionDetails.serverUrl, connectionDetails.participantToken),
-      ]).catch((error) => {
+      ]).then(() => {
+        // Set participant metadata after connection
+        const participantMetadata = genZMode ? 'genz_mode=true' : 'genz_mode=false';
+        room.localParticipant.setMetadata(participantMetadata);
+      }).catch((error) => {
         if (aborted) {
           // Once the effect has cleaned up after itself, drop any errors
           //
@@ -76,7 +81,7 @@ export function App({ appConfig }: AppProps) {
       aborted = true;
       room.disconnect();
     };
-  }, [room, sessionStarted, connectionDetails, appConfig.isPreConnectBufferEnabled]);
+  }, [room, sessionStarted, connectionDetails, appConfig.isPreConnectBufferEnabled, genZMode]);
 
   const { startButtonText } = appConfig;
 
@@ -102,6 +107,7 @@ export function App({ appConfig }: AppProps) {
         key="welcome"
         startButtonText={startButtonText}
         onStartCall={() => setSessionStarted(true)}
+        onGenZModeChange={setGenZMode}
         disabled={sessionStarted}
         initial={{ opacity: 0 }}
         animate={{ opacity: sessionStarted ? 0 : 1 }}

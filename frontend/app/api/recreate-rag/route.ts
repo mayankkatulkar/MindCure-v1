@@ -1,20 +1,33 @@
 import { NextResponse } from 'next/server';
 import { spawn } from 'child_process';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { existsSync } from 'fs';
 
-export async function POST(): Promise<NextResponse> {
+export async function POST() {
   try {
     console.log('Starting RAG recreation process...');
-
-    // Get the path to the Python script and virtual environment
+    
     const scriptPath = join(process.cwd(), '..', 'src', 'recreate_rag.py');
-    const venvPython = join(process.cwd(), '..', '.venv', 'bin', 'python');
+    console.log('Script path:', scriptPath);
+    
+    // Ensure the script exists
+    if (!existsSync(scriptPath)) {
+      console.error('recreate_rag.py script not found at:', scriptPath);
+      return NextResponse.json(
+        { error: 'RAG recreation script not found' },
+        { status: 500 }
+      );
+    }
 
-    return new Promise<NextResponse>((resolve) => {
-      // Spawn Python process using virtual environment
-      const pythonProcess = spawn(venvPython, [scriptPath], {
-        cwd: join(process.cwd(), '..', 'src'),
-        env: { ...process.env, PYTHONPATH: join(process.cwd(), '..', 'src') },
+    // Run the Python script with proper environment and path setup
+    const result = await new Promise<{ stdout: string; stderr: string; code: number }>((resolve) => {
+      const pythonProcess = spawn('python3', [scriptPath], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        env: {
+          ...process.env,
+          PYTHONPATH: '/Users/mayankkatulkar/Library/Python/3.9/lib/python/site-packages'
+        },
+        cwd: dirname(scriptPath)
       });
 
       let stdout = '';
@@ -22,65 +35,49 @@ export async function POST(): Promise<NextResponse> {
 
       pythonProcess.stdout.on('data', (data) => {
         const output = data.toString();
+        console.log('Python stdout:', output);
         stdout += output;
-        console.log('RAG Recreation:', output.trim());
       });
 
       pythonProcess.stderr.on('data', (data) => {
-        const error = data.toString();
-        stderr += error;
-        console.error('RAG Recreation Error:', error.trim());
+        const output = data.toString();
+        console.error('RAG Recreation Error:', output);
+        stderr += output;
       });
 
       pythonProcess.on('close', (code) => {
         console.log(`RAG recreation process exited with code ${code}`);
-
-        if (code === 0) {
-          resolve(
-            NextResponse.json({
-              success: true,
-              message: 'RAG embeddings recreated successfully',
-              stdout: stdout,
-              stderr: stderr,
-            })
-          );
-        } else {
-          resolve(
-            NextResponse.json(
-              {
-                success: false,
-                message: 'Failed to recreate RAG embeddings',
-                error: stderr,
-                stdout: stdout,
-              },
-              { status: 500 }
-            )
-          );
-        }
+        resolve({ stdout, stderr, code: code || 0 });
       });
 
       pythonProcess.on('error', (error) => {
         console.error('Failed to start RAG recreation process:', error);
-        resolve(
-          NextResponse.json(
-            {
-              success: false,
-              message: 'Failed to start RAG recreation process',
-              error: error.message,
-            },
-            { status: 500 }
-          )
-        );
+        resolve({ stdout: '', stderr: error.message, code: 1 });
       });
     });
+
+    if (result.code === 0) {
+      console.log('RAG recreation completed successfully');
+      return NextResponse.json({ 
+        message: 'Knowledge base updated successfully',
+        output: result.stdout 
+      });
+    } else {
+      console.error('RAG recreation failed with code:', result.code);
+      console.error('Error output:', result.stderr);
+      return NextResponse.json(
+        { 
+          error: 'Failed to update knowledge base',
+          details: result.stderr,
+          code: result.code 
+        },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error('Error in RAG recreation API:', error);
+    console.error('Error in recreate-rag route:', error);
     return NextResponse.json(
-      {
-        success: false,
-        message: 'Internal server error during RAG recreation',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

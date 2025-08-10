@@ -9,15 +9,32 @@ from dotenv import load_dotenv
 from llama_index.core import (
     SimpleDirectoryReader,
     VectorStoreIndex,
+    Settings,
 )
+from llama_index.llms.google_genai import GoogleGenAI
+from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from pathlib import Path
 import logging
+import os
 
 # Set up logging
 logger = logging.getLogger("recreate_rag")
 
+# Load environment variables from the correct path
+env_path = Path(__file__).parent.parent / ".env.local"
+load_dotenv(env_path)
 
-load_dotenv("../.env.local")
+# Configure LlamaIndex to use native Gemini models
+Settings.llm = GoogleGenAI(
+    model="models/gemini-1.5-flash",
+    api_key=os.getenv("GOOGLE_API_KEY"),
+    temperature=0.7,
+)
+
+Settings.embed_model = GoogleGenAIEmbedding(
+    model="models/text-embedding-004",
+    api_key=os.getenv("GOOGLE_API_KEY"),
+)
 
 
 def recreate_rag_embeddings():

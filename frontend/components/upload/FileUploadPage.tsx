@@ -6,10 +6,13 @@ import Upload from './Upload';
 
 export default function FileUploadPage() {
   return (
-    <div className="min-h-screen bg-white px-10 pt-30">
+    <div className="min-h-screen bg-white px-10 pt-8">
       {/* Page Title */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">Upload File</h1>
+        <h1 className="text-2xl font-bold">Upload RAG Documents</h1>
+        <p className="text-muted-foreground mt-2">
+          Upload documents to enhance Dr. Sarah's knowledge base. Supported formats: PDF, TXT, DOCX.
+        </p>
       </div>
 
       {/* Stats */}

@@ -5,15 +5,32 @@ from llama_index.core import (
     VectorStoreIndex,
     StorageContext,
     load_index_from_storage,
+    Settings,
 )
-from llama_index.llms.openai import OpenAI
+from llama_index.llms.google_genai import GoogleGenAI
+from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.core.agent.workflow import FunctionAgent
 from utils import get_doc_tools
 import logging
+import os
 
-load_dotenv(".env.local")
+# Load environment variables from the correct path
+env_path = Path(__file__).parent.parent / ".env.local"
+load_dotenv(env_path)
 
 logger = logging.getLogger(__name__)
+
+# Configure LlamaIndex to use native Gemini models
+Settings.llm = GoogleGenAI(
+    model="models/gemini-1.5-flash",
+    api_key=os.getenv("GOOGLE_API_KEY"),
+    temperature=0.7,
+)
+
+Settings.embed_model = GoogleGenAIEmbedding(
+    model="models/text-embedding-004",
+    api_key=os.getenv("GOOGLE_API_KEY"),
+)
 
 # Configuration
 THIS_DIR = Path(__file__).parent
@@ -130,8 +147,8 @@ def setup_combined_agent():
     # Step 4: Combine all tools
     all_tools = [index_tool] + file_specific_tools
 
-    # Step 5: Initialize LLM
-    llm = OpenAI(model="gpt-4o-mini")
+    # Step 5: Initialize LLM (uses the global Settings configuration)
+    llm = Settings.llm
 
     # Step 6: Create enhanced system prompt
     system_prompt = """
@@ -193,6 +210,9 @@ def update_index_with_new_documents():
 
     logger.info("Index updated with new documents")
     return index
+
+
+
 
 
 # Main execution

@@ -119,7 +119,7 @@ export const SessionView = ({
       <div className="relative flex flex-1 flex-col">
         <ChatMessageView
           className={cn(
-            'mx-auto min-h-svh w-full max-w-2xl px-3 pt-32 pb-40 transition-[opacity,translate] duration-300 ease-out md:px-0 md:pt-36 md:pb-48',
+            'mx-auto min-h-svh w-full max-w-2xl px-3 pt-20 pb-40 transition-[opacity,translate] duration-300 ease-out md:px-0 md:pt-24 md:pb-48',
             chatOpen ? 'translate-y-0 opacity-100 delay-200' : 'translate-y-20 opacity-0'
           )}
         >
@@ -140,13 +140,13 @@ export const SessionView = ({
           </div>
         </ChatMessageView>
 
-        <div className="bg-background mp-12 fixed top-0 right-0 left-0 h-32 md:h-36">
+        <div className="bg-background mp-12 fixed top-16 right-0 left-0 h-20 md:h-24">
           {/* skrim */}
           <div className="from-background absolute bottom-0 left-0 h-12 w-full translate-y-full bg-gradient-to-b to-transparent" />
         </div>
 
         {/* Media Tiles Container - Centered in main content area */}
-        <div className="pointer-events-none absolute inset-x-0 top-8 bottom-32 z-50 md:top-12 md:bottom-40">
+        <div className="pointer-events-none absolute inset-x-0 top-20 bottom-32 z-50 md:top-24 md:bottom-40">
           <div className="relative mx-auto h-full max-w-2xl px-4 md:px-0">
             <MediaTiles chatOpen={chatOpen} streamingPanelOpen={streamingPanelOpen} />
           </div>
@@ -216,7 +216,7 @@ export const SessionView = ({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
           onClick={() => setStreamingPanelOpen(!streamingPanelOpen)}
-          className="bg-background/80 border-border hover:bg-background/90 absolute top-5 right-4 z-50 rounded-lg border p-2 shadow-lg backdrop-blur-sm transition-colors"
+          className="bg-background/80 border-border hover:bg-background/90 absolute top-20 right-4 z-50 rounded-lg border p-2 shadow-lg backdrop-blur-sm transition-colors"
           title={streamingPanelOpen ? 'Hide transcript' : 'Show transcript'}
         >
           <div className="flex h-5 w-5 items-center justify-center">
