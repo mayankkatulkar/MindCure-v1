@@ -49,21 +49,10 @@ class Assistant(Agent):
     @function_tool
     async def LiveKit_RAG_tool(self, context: RunContext, query: str):
         """
-        Access the comprehensive CBT manual and mental health knowledge base. This contains:
-        - A Therapist's Guide to Brief Cognitive Behavioral Therapy
-        - Specific CBT techniques and interventions
-        - Patient handouts and exercises  
-        - Treatment planning approaches
-        - Evidence-based strategies for anxiety, depression, etc.
-        
-        Use this when you need to:
-        - Get specific CBT techniques for a user's issue
-        - Find exercises or homework assignments
-        - Access patient handouts or structured interventions
-        - Look up evidence-based approaches for specific disorders
+        Use this tool to get the data quickly from Livekit RAG model
 
         Args:
-            query: Your specific question about CBT techniques, interventions, or mental health approaches
+            query: The query to get the data for
         """
 
         try:
@@ -78,17 +67,10 @@ class Assistant(Agent):
     @function_tool
     async def Llamaindex_RAG_tool(self, context: RunContext, query: str):
         """
-        Advanced reasoning tool for complex therapeutic questions that require deep analysis.
-        Use this when you need sophisticated reasoning about:
-        - Complex case conceptualization
-        - Multi-step treatment planning  
-        - Integrating multiple CBT techniques
-        - Advanced therapeutic decision-making
-        
-        Only use this tool when the LiveKit RAG tool isn't sufficient for complex reasoning.
+        Only use this tool when deep reasoning is needed.
 
         Args:
-            query: Complex therapeutic question requiring deep reasoning and analysis
+            query: The query to get the data for
         """
 
         try:
@@ -156,11 +138,33 @@ class Assistant(Agent):
         """
         try:
             logger.info(f"Searching for {specialty} therapists in {location}")
-            response = await search_therapists_near(location, specialty)
-            return str(response)
+            
+            # First, recommend our internal therapist directory
+            internal_directory_response = f"""
+I can help you find qualified therapists for {specialty} treatment in {location}! 
+
+🏥 **MindCure Therapist Directory**: I recommend starting with our curated therapist directory at localhost:3000/therapist-directory where you'll find:
+- Licensed therapists specializing in {specialty}
+- Verified credentials and reviews
+- Available appointment times
+- Insurance coverage information
+- Video, voice, and in-person session options
+
+🌐 **Additional Options**: I can also search Psychology Today's database for more therapists in your area.
+
+Would you like me to open our therapist directory or search external databases?
+            """
+            
+            # Also try the external search as backup
+            try:
+                external_response = await search_therapists_near(location, specialty)
+                return f"{internal_directory_response}\n\n**External Search Results**: {external_response}"
+            except:
+                return internal_directory_response
+                
         except Exception as e:
             logger.error(f"Therapist search failed: {e}")
-            return f"I'm having trouble searching for therapists right now. I'd recommend checking Psychology Today or your insurance provider's website for therapists in {location}."
+            return f"I'd recommend checking our MindCure therapist directory (localhost:3000/therapist-directory) or Psychology Today for therapists specializing in {specialty} in {location}."
 
     @function_tool
     async def emergency_resources_tool(self, context: RunContext, location: str):

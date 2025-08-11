@@ -2,6 +2,7 @@ import localFont from 'next/font/local';
 import { headers } from 'next/headers';
 import { ApplyThemeScript, ThemeToggle } from '@/components/theme-toggle';
 import { AppHeader } from '@/components/app-header';
+import { ConditionalHeader } from '@/components/conditional-header';
 import { getAppConfig } from '@/lib/utils';
 import './globals.css';
 
@@ -64,23 +65,16 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     .join('\n');
 
   return (
-    <html lang="en" suppressHydrationWarning className="scroll-smooth">
+    <html lang="en" className="dark">
       <head>
-        {styles && <style>{styles}</style>}
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
         <ApplyThemeScript />
+        {styles && <style>{styles}</style>}
       </head>
-      <body
-        className={`${publicSans.variable} ${commitMono.variable} overflow-x-hidden antialiased`}
-      >
-        <AppHeader />
-        <div className="pt-16">
+      <body className={`${publicSans.className} antialiased`}>
+        <ConditionalHeader />
+        <main className="conditional-padding">
           {children}
-        </div>
-        <div className="group fixed bottom-0 left-1/2 z-50 mb-2 -translate-x-1/2">
-          <ThemeToggle className="translate-y-20 transition-transform delay-150 duration-300 group-hover:translate-y-0" />
-        </div>
+        </main>
       </body>
     </html>
   );

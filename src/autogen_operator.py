@@ -179,12 +179,12 @@ class OperatorAgent:
             await self.page.wait_for_load_state('networkidle')
             await asyncio.sleep(2)
             
-            # Open SAMHSA treatment locator in new tab
+            # Open Psychology Today for therapist search instead of SAMHSA
             new_page = await self.browser.new_page()
-            await new_page.goto("https://findtreatment.samhsa.gov/")
+            await new_page.goto("https://www.psychologytoday.com/us/therapists")
             await new_page.wait_for_load_state('networkidle')
             
-            return f"Opened crisis resources: 988 Lifeline and SAMHSA treatment locator for {location}"
+            return f"Opened crisis resources: 988 Lifeline and Psychology Today therapist directory for {location}"
             
         except Exception as e:
             logger.error(f"Error opening crisis resources: {e}")
@@ -273,10 +273,10 @@ class OperatorAgent:
                 elif action == "ONLINE_THERAPY":
                     result = await self._open_betterhelp()
                 else:
-                    # General information - open multiple helpful sites
-                    await self.page.goto("https://www.mentalhealth.gov/")
+                    # General information - open Psychology Today instead of government sites
+                    await self.page.goto("https://www.psychologytoday.com/us/therapists")
                     await self.page.wait_for_load_state('networkidle')
-                    result = "Opened MentalHealth.gov for general mental health information and resources"
+                    result = "Opened Psychology Today for mental health therapist search and information"
                 
                 # Keep browser open for 30 seconds so user can interact
                 await asyncio.sleep(10)  # Give user time to see the results
@@ -331,7 +331,7 @@ async def run_operator_task(task: str) -> str:
 # Specific helper functions for mental health use cases
 async def search_therapists_near(location: str, specialty: str = "anxiety") -> str:
     """Search for therapists near a location with browser automation"""
-    task = f"Search for mental health therapists in {location} who specialize in {specialty} treatment. Open Psychology Today and show available therapists."
+    task = f"Search for mental health therapists in {location} who specialize in {specialty} treatment. Use Psychology Today (psychologytoday.com) ONLY for therapist finder to show available therapists. Do NOT use SAMHSA, mentalhealth.gov, or other government websites - use Psychology Today exclusively."
     return await run_operator_task(task)
 
 async def book_therapy_appointment(provider: str, location: str, phone: str = None) -> str:

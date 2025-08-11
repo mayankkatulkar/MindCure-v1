@@ -245,3 +245,13 @@
     }
   }
 }
+
+/* Conditional padding for pages with/without header */
+.conditional-padding:has(.landing-container),
+.conditional-padding:has(.auth-container) {
+  padding-top: 0;
+}
+
+.conditional-padding:not(:has(.landing-container)):not(:has(.auth-container)) {
+  padding-top: 4rem;
+}
