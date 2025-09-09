@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AppHeader } from '@/components/app-header';
 import './peer-support.css';
 
 const PeerSupport = () => {
@@ -10,6 +9,8 @@ const PeerSupport = () => {
   const [matchFound, setMatchFound] = useState(false);
   const [currentMatch, setCurrentMatch] = useState<any>(null);
   const [supportMode, setSupportMode] = useState('random'); // 'random', 'groups', 'similar', 'local'
+  const [inVideoCall, setInVideoCall] = useState(false);
+  const [callType, setCallType] = useState<'video' | 'voice' | 'text'>('text');
 
   const [supportGroups] = useState([
     {
@@ -80,7 +81,33 @@ const PeerSupport = () => {
   const endChat = () => {
     setMatchFound(false);
     setCurrentMatch(null);
+    setInVideoCall(false);
+    setCallType('text');
   };
+
+  const startVideoChat = () => {
+    setCallType('video');
+    setInVideoCall(true);
+  };
+
+  const startVoiceChat = () => {
+    setCallType('voice');
+    setInVideoCall(true);
+  };
+
+  // If in video call, show video interface
+  if (inVideoCall && currentMatch) {
+    return (
+      <div className="peer-support video-mode">
+        <VideoCall
+          roomName={`peer-support-${currentMatch.id}`}
+          participantName={`User-${Math.floor(Math.random() * 1000)}`}
+          onDisconnect={endChat}
+          callType="peer-support"
+        />
+      </div>
+    );
+  }
 
   const findSimilarExperiences = () => {
     setSupportMode('similar');
@@ -93,9 +120,7 @@ const PeerSupport = () => {
   };
 
   return (
-    <>
-      <AppHeader />
-      <div className="peer-support" style={{ paddingTop: '4rem' }}>
+    <div className="peer-support">
       {/* Online Status */}
       <div className="online-status">
         <div className="status-indicator">
@@ -214,8 +239,15 @@ const PeerSupport = () => {
               <p>💬 Start typing or click the microphone to begin voice chat</p>
             </div>
             <div className="chat-controls">
-              <button className="voice-button">🎤 Voice Chat</button>
-              <button className="text-button active">💬 Text Chat</button>
+              <button className="voice-button" onClick={startVoiceChat}>
+                🎤 Voice Chat
+              </button>
+              <button className="video-button" onClick={startVideoChat}>
+                📹 Video Chat
+              </button>
+              <button className={`text-button ${callType === 'text' ? 'active' : ''}`}>
+                💬 Text Chat
+              </button>
               <button className="report-button">⚠️ Report</button>
             </div>
           </div>
@@ -285,7 +317,6 @@ const PeerSupport = () => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 

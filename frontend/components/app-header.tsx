@@ -39,7 +39,7 @@ export function AppHeader() {
               <h1 className="text-lg font-bold text-foreground leading-none">
                 MindCure
               </h1>
-              <span className="text-xs text-muted-foreground leading-none">Mental Health Platform</span>
+              <span className="text-xs text-muted-foreground leading-none">Mental Wellness Platform</span>
             </div>
           </div>
 

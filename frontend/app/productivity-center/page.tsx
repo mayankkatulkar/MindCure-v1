@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AppHeader } from '@/components/app-header';
 import './productivity-center.css';
 
 const ProductivityCenter = () => {
@@ -9,10 +8,10 @@ const ProductivityCenter = () => {
   const [mentalHealthScore, setMentalHealthScore] = useState(75);
   const [currentStreak, setCurrentStreak] = useState(7);
   const [todaysTasks, setTodaysTasks] = useState([
-    { id: 1, task: '25-minute focus session', completed: true, type: 'focus', impact: '+3 mental health' },
+    { id: 1, task: '25-minute focus session', completed: true, type: 'focus', impact: '+3 mental wellness' },
     { id: 2, task: 'Take a mindful break', completed: false, type: 'wellness', impact: '+2 productivity', current: true },
     { id: 3, task: 'Complete project milestone', completed: false, type: 'work', impact: '+5 productivity' },
-    { id: 4, task: 'Evening meditation (AI recommended)', completed: false, type: 'meditation', impact: '+4 mental health' }
+    { id: 4, task: 'Evening meditation (AI recommended)', completed: false, type: 'meditation', impact: '+4 mental wellness' }
   ]);
 
   const [weeklyProgress] = useState({
@@ -37,6 +36,28 @@ const ProductivityCenter = () => {
 
   const [isGeneratingTasks, setIsGeneratingTasks] = useState(false);
 
+  // Fetch productivity data from API
+  useEffect(() => {
+    const fetchProductivityData = async () => {
+      try {
+        const response = await fetch('/api/productivity');
+        if (response.ok) {
+          const data = await response.json();
+          setProductivityScore(data.productivityScore);
+          setMentalHealthScore(data.mentalHealthScore);
+          setCurrentStreak(data.currentStreak);
+          setTodaysTasks(data.todaysTasks);
+        }
+      } catch (error) {
+        console.error('Failed to fetch productivity data:', error);
+      }
+    };
+    
+    fetchProductivityData();
+    const interval = setInterval(fetchProductivityData, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   // Focus session timer
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -55,12 +76,29 @@ const ProductivityCenter = () => {
     return () => clearInterval(interval);
   }, [focusSession.active, focusSession.timeRemaining]);
 
-  const toggleTask = (taskId: number) => {
-    setTodaysTasks(prev => prev.map(task => 
-      task.id === taskId 
-        ? { ...task, completed: !task.completed }
-        : task
-    ));
+  const toggleTask = async (taskId: number) => {
+    try {
+      const response = await fetch('/api/productivity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'toggleTask', taskId })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        setTodaysTasks(result.data.todaysTasks);
+        setProductivityScore(result.data.productivityScore);
+        setMentalHealthScore(result.data.mentalHealthScore);
+      }
+    } catch (error) {
+      console.error('Failed to toggle task:', error);
+      // Fallback to local state update
+      setTodaysTasks(prev => prev.map(task => 
+        task.id === taskId 
+          ? { ...task, completed: !task.completed }
+          : task
+      ));
+    }
   };
 
   const startFocusSession = () => {
@@ -81,7 +119,7 @@ const ProductivityCenter = () => {
     setTimeout(() => {
       const newTasks = [
         { id: Date.now() + 1, task: 'Review weekly goals', completed: false, type: 'planning', impact: '+3 productivity' },
-        { id: Date.now() + 2, task: 'Practice breathing exercise', completed: false, type: 'wellness', impact: '+2 mental health' },
+        { id: Date.now() + 2, task: 'Practice breathing exercise', completed: false, type: 'wellness', impact: '+2 mental wellness' },
         { id: Date.now() + 3, task: 'Organize workspace', completed: false, type: 'environment', impact: '+1 productivity' }
       ];
       setTodaysTasks(prev => [...prev, ...newTasks]);
@@ -117,9 +155,7 @@ const ProductivityCenter = () => {
   };
 
   return (
-    <>
-      <AppHeader />
-      <div className="productivity-center" style={{ paddingTop: '4rem' }}>
+    <div className="productivity-center">
       {/* Score Overview */}
       <div className="scores-overview">
         <div className="score-card productivity">
@@ -132,7 +168,7 @@ const ProductivityCenter = () => {
               <div className="score-value">{productivityScore}</div>
             </div>
             <div className="score-impact">
-              <p>Linked to mental health</p>
+              <p>Linked to mental wellness</p>
               <div className="connection-line"></div>
             </div>
           </div>
@@ -140,7 +176,7 @@ const ProductivityCenter = () => {
 
         <div className="score-card mental-health">
           <div className="score-header">
-            <h3>Mental Health</h3>
+            <h3>Mental Wellness</h3>
             <span className="score-trend">+{weeklyProgress.mentalHealthImprovement}</span>
           </div>
           <div className="score-display">
@@ -254,7 +290,7 @@ const ProductivityCenter = () => {
             <div className="progress-icon">📈</div>
             <div className="progress-content">
               <div className="progress-value">+{weeklyProgress.mentalHealthImprovement}</div>
-              <div className="progress-label">Mental Health</div>
+              <div className="progress-label">Mental Wellness</div>
             </div>
           </div>
           <div className="progress-item">
@@ -300,7 +336,6 @@ const ProductivityCenter = () => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 

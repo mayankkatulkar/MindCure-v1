@@ -42,7 +42,7 @@ export default function LandingPage() {
     {
       icon: '📈',
       title: 'Progress Tracking',
-      description: 'Monitor your mental health journey with AI-powered insights and personalized recommendations',
+      description: 'Monitor your mental wellness journey with AI-powered insights and personalized recommendations',
       gradient: 'from-orange-500 to-red-500'
     }
   ];
@@ -100,11 +100,11 @@ export default function LandingPage() {
         
         <div className={`hero-content ${isVisible ? 'visible' : ''}`}>
           <h1 className="hero-title">
-            Your Mental Health Journey
+            Your Mental Wellness Journey
             <span className="hero-highlight"> Starts Here</span>
           </h1>
           <p className="hero-subtitle">
-            Experience the future of mental health care with AI-powered therapy, 
+            Experience the future of mental wellness care with AI-powered therapy, 
             professional support, and a caring community all in one platform.
           </p>
           
@@ -141,7 +141,7 @@ export default function LandingPage() {
             Everything You Need for Mental Wellness
           </h2>
           <p className="section-subtitle">
-            Comprehensive mental health support tailored to your unique needs
+            Comprehensive mental wellness support tailored to your unique needs
           </p>
 
           <div className="features-grid">
@@ -179,7 +179,7 @@ export default function LandingPage() {
               <div className="step-content">
                 <h3 className="step-title">Create Your Profile</h3>
                 <p className="step-description">
-                  Share your mental health goals and preferences to personalize your experience
+                  Share your mental wellness goals and preferences to personalize your experience
                 </p>
               </div>
             </div>
@@ -237,7 +237,7 @@ export default function LandingPage() {
           <div className="crisis-text">
             <h3 className="crisis-title">Need Immediate Help?</h3>
             <p className="crisis-description">
-              If you're experiencing a mental health crisis, support is available 24/7
+              If you're experiencing a mental wellness crisis, support is available 24/7
             </p>
           </div>
           <Link href="/crisis-support" className="crisis-button">
@@ -250,7 +250,7 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className="cta-section">
         <div className="cta-content">
-          <h2 className="cta-title">Ready to Transform Your Mental Health?</h2>
+          <h2 className="cta-title">Ready to Transform Your Mental Wellness?</h2>
           <p className="cta-subtitle">
             Join thousands of people who've found hope, healing, and community with MindCure
           </p>

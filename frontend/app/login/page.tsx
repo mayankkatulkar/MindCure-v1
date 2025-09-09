@@ -91,7 +91,7 @@ const LoginPage = () => {
         <div className="auth-card">
           <div className="auth-header">
             <h1 className="auth-title">Welcome Back</h1>
-            <p className="auth-subtitle">Sign in to continue your mental health journey</p>
+            <p className="auth-subtitle">Sign in to continue your mental wellness journey</p>
           </div>
 
           <form className="auth-form" onSubmit={handleSubmit}>
@@ -188,7 +188,7 @@ const LoginPage = () => {
               <span className="feature-icon">🤖</span>
               <div>
                 <h4>AI-Powered Therapy</h4>
-                <p>24/7 access to intelligent mental health support</p>
+                <p>24/7 access to intelligent mental wellness support</p>
               </div>
             </div>
             <div className="feature-item">
@@ -209,7 +209,7 @@ const LoginPage = () => {
               <span className="feature-icon">📈</span>
               <div>
                 <h4>Progress Tracking</h4>
-                <p>Monitor your mental health journey over time</p>
+                <p>Monitor your mental wellness journey over time</p>
               </div>
             </div>
           </div>

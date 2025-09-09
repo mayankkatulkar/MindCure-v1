@@ -41,7 +41,7 @@ const SignupPage = () => {
     password: '',
     confirmPassword: '',
     
-    // Step 2: Mental Health Profile
+    // Step 2: Mental Wellness Profile
     mentalHealthGoals: [],
     currentChallenges: [],
     previousTherapy: '',
@@ -123,7 +123,7 @@ const SignupPage = () => {
         break;
       case 2:
         if (formData.mentalHealthGoals.length === 0) {
-          setError('Please select at least one mental health goal');
+          setError('Please select at least one mental wellness goal');
           return false;
         }
         break;
@@ -199,7 +199,7 @@ const SignupPage = () => {
   const renderStep1 = () => (
     <div className="step-content">
       <h2 className="step-title">Create Your Account</h2>
-      <p className="step-subtitle">Let's start your mental health journey</p>
+      <p className="step-subtitle">Let's start your mental wellness journey</p>
 
       <div className="form-row">
         <div className="form-group">
@@ -276,11 +276,11 @@ const SignupPage = () => {
 
   const renderStep2 = () => (
     <div className="step-content">
-      <h2 className="step-title">Mental Health Profile</h2>
+      <h2 className="step-title">Mental Wellness Profile</h2>
       <p className="step-subtitle">Help us personalize your experience</p>
 
       <div className="form-group">
-        <label className="form-label">What are your mental health goals? (Select all that apply)</label>
+        <label className="form-label">What are your mental wellness goals? (Select all that apply)</label>
         <div className="checkbox-grid">
           {mentalHealthGoals.map(goal => (
             <label key={goal} className="checkbox-item">
@@ -400,7 +400,7 @@ const SignupPage = () => {
         <div className="auth-card signup">
           <div className="auth-header">
             <h1 className="auth-title">Join MindCure</h1>
-            <p className="auth-subtitle">Start your personalized mental health journey today</p>
+            <p className="auth-subtitle">Start your personalized mental wellness journey today</p>
           </div>
 
           {renderStepIndicator()}

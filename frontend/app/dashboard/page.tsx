@@ -13,8 +13,8 @@ const Dashboard = () => {
   const [recentActivity, setRecentActivity] = useState([
     { type: 'therapy', text: 'AI therapy session completed', time: '2 hours ago', icon: '🤖' },
     { type: 'breathing', text: 'Breathing exercise - 5 minutes', time: '4 hours ago', icon: '🫁' },
-    { type: 'task', text: 'Completed daily mental health task', time: '6 hours ago', icon: '✅' },
-    { type: 'progress', text: 'Mental health score improved +3', time: '1 day ago', icon: '📈' }
+    { type: 'task', text: 'Completed daily mental wellness task', time: '6 hours ago', icon: '✅' },
+    { type: 'progress', text: 'Mental wellness score improved +3', time: '1 day ago', icon: '📈' }
   ]);
 
   const [quickStats, setQuickStats] = useState({
@@ -24,21 +24,50 @@ const Dashboard = () => {
     goalsAchieved: 4
   });
 
-  // Connection check
+  // Fetch dashboard data from API
   useEffect(() => {
-    const checkConnection = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const response = await fetch('/api/health');
-        setIsConnected(response.ok);
+        const response = await fetch('/api/dashboard');
+        if (response.ok) {
+          const data = await response.json();
+          setMentalHealthScore(data.mentalHealthScore);
+          setProductivityScore(data.productivityScore);
+          setQuickStats(data.quickStats);
+          setRecentActivity(data.recentActivity);
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+        }
       } catch (error) {
         setIsConnected(false);
       }
     };
     
-    checkConnection();
-    const interval = setInterval(checkConnection, 60000); // Changed from 30 seconds to 60 seconds for less server load
+    fetchDashboardData();
+    const interval = setInterval(fetchDashboardData, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
   }, []);
+
+  // Update progress when activities are completed
+  const updateProgress = async (activity: string) => {
+    try {
+      const response = await fetch('/api/dashboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activity })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        setMentalHealthScore(result.data.mentalHealthScore);
+        setProductivityScore(result.data.productivityScore);
+        setRecentActivity(result.data.recentActivity);
+      }
+    } catch (error) {
+      console.error('Failed to update progress:', error);
+    }
+  };
 
   const navigateToPage = (path: string) => {
     router.push(path);
@@ -60,7 +89,7 @@ const Dashboard = () => {
       <div className="scores-section">
         <div className="score-card primary">
           <div className="score-header">
-            <h3>Mental Health Score</h3>
+            <h3>Mental Wellness Score</h3>
             <span className="score-trend positive">+{quickStats.weeklyProgress}</span>
           </div>
           <div className="score-display">
@@ -124,7 +153,10 @@ const Dashboard = () => {
       <div className="quick-actions">
         <h3 className="section-title">Quick Actions</h3>
         <div className="action-grid">
-          <button className="action-card primary" onClick={() => navigateToPage('/voice-chat')}>
+          <button className="action-card primary" onClick={() => {
+            updateProgress('therapy');
+            navigateToPage('/voice-chat');
+          }}>
             <div className="action-icon">🤖</div>
             <div className="action-content">
               <h4>Talk to AI Now</h4>
@@ -182,13 +214,16 @@ const Dashboard = () => {
           <div className="focus-content">
             <h4>Mindful Breathing</h4>
             <p>Take 10 minutes for a guided breathing exercise to center yourself and reduce stress.</p>
-            <button className="focus-action" onClick={() => navigateToPage('/voice-chat')}>
+            <button className="focus-action" onClick={() => {
+              updateProgress('task');
+              navigateToPage('/voice-chat');
+            }}>
               Start Now
             </button>
           </div>
         </div>
       </div>
-    </div>
+      </div>
     </>
   );
 };

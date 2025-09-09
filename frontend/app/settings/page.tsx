@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AppHeader } from '@/components/app-header';
 import './settings.css';
 
 const Settings = () => {
@@ -668,9 +667,7 @@ const Settings = () => {
   );
 
   return (
-    <>
-      <AppHeader />
-      <div className="settings-container" style={{ paddingTop: '4rem' }}>
+    <div className="settings-container">
       <div className="settings-header">
         <h1 className="settings-title">Settings</h1>
         <p className="settings-subtitle">Manage your account, privacy, and preferences</p>
@@ -735,7 +732,6 @@ const Settings = () => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 

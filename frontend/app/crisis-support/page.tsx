@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AppHeader } from '@/components/app-header';
 import './crisis-support.css';
 
 const CrisisSupport = () => {
@@ -102,9 +101,7 @@ const CrisisSupport = () => {
   };
 
   return (
-    <>
-      <AppHeader />
-      <div className="crisis-support" style={{ paddingTop: '4rem' }}>
+    <div className="crisis-support">
       {/* Emergency Alert */}
       <div className="emergency-alert">
         <div className="alert-icon">🚨</div>
@@ -232,7 +229,7 @@ const CrisisSupport = () => {
             <div className="option-icon">👩‍⚕️</div>
             <div className="option-content">
               <h4>Find a Therapist</h4>
-              <p>Connect with mental health professionals in your area</p>
+              <p>Connect with mental wellness professionals in your area</p>
               <button 
                 className="option-button"
                 onClick={() => window.location.href = '/therapist-directory'}
@@ -267,7 +264,6 @@ const CrisisSupport = () => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 

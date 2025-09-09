@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from anyio import Path
 from dotenv import load_dotenv
@@ -35,6 +36,9 @@ from llamaindex_rag import setup_combined_agent
 
 # Import for AutoGen Operator
 from autogen_operator import run_operator_task, search_therapists_near, book_therapy_appointment, get_crisis_help
+
+# Import shared data store
+from shared_data import shared_data
 
 workflow_agent, index, file_tools = setup_combined_agent()
 
@@ -189,6 +193,110 @@ Would you like me to open our therapist directory or search external databases?
             - Emergency Services: 911
             
             If you're in immediate danger, please call 911 or go to your nearest emergency room."""
+
+    @function_tool
+    async def get_dashboard_data(self, context: RunContext):
+        """
+        Get current dashboard data including mental health score, productivity score, streaks, and recent activity.
+        Use this to provide real-time dashboard information.
+        """
+        try:
+            dashboard_data = shared_data.get_dashboard_data()
+            logger.info("Retrieved dashboard data from shared store")
+            return f"""Current Dashboard Status:
+🧠 Mental Health Score: {dashboard_data['mentalHealthScore']}/100
+⚡ Productivity Score: {dashboard_data['productivityScore']}/100
+🔥 Current Streak: {dashboard_data['quickStats']['streakDays']} days
+🎯 Goals Achieved: {dashboard_data['quickStats']['goalsAchieved']}
+💬 AI Sessions: {dashboard_data['quickStats']['sessionsCompleted']}
+📈 Weekly Progress: +{dashboard_data['quickStats']['weeklyProgress']}
+
+Recent Activity:
+{chr(10).join([f"• {activity['icon']} {activity['text']} ({activity['time']})" for activity in dashboard_data['recentActivity']])}"""
+            
+        except Exception as e:
+            logger.error(f"Error getting dashboard data: {e}")
+            return "I'm having trouble accessing your dashboard data right now."
+
+    @function_tool 
+    async def get_productivity_data(self, context: RunContext):
+        """
+        Get current productivity center data including scores, tasks, habits, and weekly progress.
+        Use this to provide real-time productivity information.
+        """
+        try:
+            productivity_data = shared_data.get_productivity_data()
+            
+            completed_tasks = len([t for t in productivity_data['todaysTasks'] if t['completed']])
+            total_tasks = len(productivity_data['todaysTasks'])
+            
+            logger.info("Retrieved productivity data from shared store")
+            return f"""Current Productivity Status:
+⚡ Productivity Score: {productivity_data['productivityScore']}/100
+🧠 Mental Health Score: {productivity_data['mentalHealthScore']}/100
+🔥 Current Streak: {productivity_data['currentStreak']} days
+
+Today's Tasks Progress: {completed_tasks}/{total_tasks} completed
+Pending Tasks:
+{chr(10).join([f"• {task['task']} ({task['impact']})" for task in productivity_data['todaysTasks'] if not task['completed']])}
+
+Weekly Progress:
+📈 Mental Health: +{productivity_data['weeklyProgress']['mentalHealthImprovement']}
+⚡ Productivity: +{productivity_data['weeklyProgress']['productivityIncrease']}
+✅ Tasks Completed: {productivity_data['weeklyProgress']['tasksCompleted']}
+🎯 Focus Time: {productivity_data['weeklyProgress']['focusMinutes']} minutes"""
+            
+        except Exception as e:
+            logger.error(f"Error getting productivity data: {e}")
+            return "I'm having trouble accessing your productivity data right now."
+
+    @function_tool
+    async def update_user_progress(self, context: RunContext, activity_type: str, score_change: int = 0):
+        """
+        Update user progress after completing activities like therapy sessions, tasks, or exercises.
+        
+        Args:
+            activity_type: Type of activity completed (therapy, task, exercise, meditation, focus_session)
+            score_change: Points to add to relevant scores (default 0 for auto-calculation)
+        """
+        try:
+            result = shared_data.update_scores(activity_type, score_change)
+            
+            logger.info(f"Updated progress for {activity_type}: {result['score_changes']}")
+            return f"""🎉 {result['message']}
+
+Score Updates:
+🧠 Mental Health: {result['new_scores']['mental_health']}/100 (+{result['score_changes']['mental_health']})
+⚡ Productivity: {result['new_scores']['productivity']}/100 (+{result['score_changes']['productivity']})
+
+Keep up the great work! Your consistent effort is paying off."""
+            
+        except Exception as e:
+            logger.error(f"Error updating progress: {e}")
+            return "I had trouble updating your progress, but great job on completing that activity!"
+
+    @function_tool
+    async def get_current_scores(self, context: RunContext):
+        """
+        Get current user scores and stats. Use this when user asks about their current progress or scores.
+        """
+        try:
+            scores = shared_data.get_current_scores()
+            
+            logger.info("Retrieved current scores from shared store")
+            return f"""Your Current Scores & Progress:
+
+🧠 Mental Health Score: {scores['mental_health_score']}/100
+⚡ Productivity Score: {scores['productivity_score']}/100
+🔥 Current Streak: {scores['streak_days']} days
+💬 AI Sessions Completed: {scores['sessions_completed']}
+🎯 Goals Achieved: {scores['goals_achieved']}
+
+You're doing great! Keep up the consistent effort to maintain and improve these scores."""
+            
+        except Exception as e:
+            logger.error(f"Error getting current scores: {e}")
+            return "I'm having trouble accessing your current scores right now."
 
 
 def prewarm(proc: JobProcess):
