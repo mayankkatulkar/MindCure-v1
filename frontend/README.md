@@ -43,63 +43,6 @@ Also available for:
 - **Radix UI** components for accessibility
 - **Motion** animations for smooth interactions
 
-## Project Structure
-
-```
-frontend/
-├── app/
-│   ├── (app)/
-│   │   ├── call-traces/          # Call traces page
-│   │   ├── file-upload/          # File upload page
-│   │   ├── test-call-traces/     # Test call traces page
-│   │   └── page.tsx              # Main page
-│   ├── api/
-│   │   ├── add-call-trace/       # Add call trace endpoint
-│   │   ├── clear-call-traces/    # Clear call traces endpoint
-│   │   ├── connection-details/   # Connection details endpoint
-│   │   ├── get-call-traces/      # Get call traces endpoint
-│   │   ├── recreate-rag/         # RAG recreation endpoint
-│   │   └── upload/               # File upload endpoint
-│   ├── components/               # App-specific components
-│   ├── fonts/                   # Custom fonts
-│   ├── globals.css              # Global styles
-│   └── layout.tsx               # Root layout
-├── components/
-│   ├── call-traces/             # Call trace components
-│   │   ├── call-trace-card.tsx
-│   │   ├── call-trace-filters.tsx
-│   │   ├── call-trace-stats.tsx
-│   │   └── call-traces-view.tsx
-│   ├── livekit/                 # LiveKit-specific components
-│   │   ├── agent-control-bar/
-│   │   ├── chat/
-│   │   ├── device-select.tsx
-│   │   ├── media-tiles.tsx
-│   │   └── video-tile.tsx
-│   ├── upload/                  # File upload components
-│   │   ├── Clear.tsx
-│   │   ├── ClearCallTraces.tsx
-│   │   ├── FileUploadPage.tsx
-│   │   ├── Stats.tsx
-│   │   ├── UpdateKnowledgeBase.tsx
-│   │   └── Upload.tsx
-│   ├── ui/                      # Reusable UI components
-│   │   ├── alert.tsx
-│   │   ├── button.tsx
-│   │   ├── card.tsx
-│   │   ├── select.tsx
-│   │   ├── sonner.tsx
-│   │   └── toggle.tsx
-│   ├── app.tsx                  # Main app component
-│   ├── session-view.tsx         # Session view component
-│   ├── streaming-text-panel.tsx # Streaming text display
-│   └── welcome.tsx              # Welcome component
-├── hooks/                       # Custom React hooks
-├── lib/                         # Utility functions and types
-├── data/                        # Static data files
-└── public/                      # Static assets
-```
-
 ## Getting Started
 
 ### Prerequisites
@@ -139,9 +82,7 @@ For the easiest setup, deploy directly to LiveKit Cloud:
 
 [![Open on LiveKit](https://img.shields.io/badge/Open%20on%20LiveKit%20Cloud-002CF2?style=for-the-badge&logo=external-link)](https://cloud.livekit.io/projects/p_/sandbox/templates/voice-assistant-frontend)
 
-Or use the LiveKit CLI:
-```bash
-lk app create --template agent-starter-react
+
 ```
 
 ## Configuration
@@ -228,16 +169,8 @@ pnpm format:check # Check code formatting
 - **Animations:** Motion (Framer Motion)
 - **Package Manager:** pnpm
 
-## Contributing
 
-This template is open source and we welcome contributions! Please:
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-Join us in the [LiveKit Community Slack](https://livekit.io/join-slack) for discussions and support!
 
 ## License
 

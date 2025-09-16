@@ -1,29 +1,6 @@
 # 📁 File Structure Guide
 
-This guide provides a detailed explanation of every file and directory in the Voice AI Agent Starter project.
 
-## 🏗️ Root Directory Structure
-
-```
-agent-starter-python/
-├── 📄 Documentation Files
-├── 📁 Backend (Python)
-├── 📁 Frontend (Next.js)
-├── 📁 Configuration & Build
-├── 📁 Testing & Development
-└── 📁 Deployment & Infrastructure
-```
-
-## 📄 Documentation Files
-
-| File | Purpose | Description |
-|------|---------|-------------|
-| **[README.md](./README.md)** | Main project overview | Complete project introduction, quick start, and feature summary |
-| **[DOCUMENTATION.md](./DOCUMENTATION.md)** | Documentation index | Central navigation hub for all documentation |
-| **[README_backend.md](./README_backend.md)** | Backend implementation guide | Detailed Python backend documentation |
-| **[frontend/README.md](./frontend/README.md)** | Frontend implementation guide | Next.js application documentation |
-| **[IMPROVEMENTS.md](./IMPROVEMENTS.md)** | Development notes | Recent improvements and implementation details |
-| **[LICENSE](./LICENSE)** | Legal terms | MIT License for the project |
 
 ## 🐍 Backend (Python) - `/src/`
 

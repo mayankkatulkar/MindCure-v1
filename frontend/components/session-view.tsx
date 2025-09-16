@@ -15,6 +15,7 @@ import { ChatEntry } from '@/components/livekit/chat/chat-entry';
 import { ChatMessageView } from '@/components/livekit/chat/chat-message-view';
 import { MediaTiles } from '@/components/livekit/media-tiles';
 import { StreamingTextPanel } from '@/components/streaming-text-panel';
+import { BrowserAutomationViewer } from '@/components/browser-automation-viewer';
 import useChatAndTranscription from '@/hooks/useChatAndTranscription';
 import type { AppConfig } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -38,6 +39,7 @@ export const SessionView = ({
   const { state: agentState } = useVoiceAssistant();
   const [chatOpen, setChatOpen] = useState(false);
   const [streamingPanelOpen, setStreamingPanelOpen] = useState(true);
+  const [browserAutomationOpen, setBrowserAutomationOpen] = useState(false);
   const { messages, send } = useChatAndTranscription();
   const { addMessage, endSession, isInRoomContext } = useCallTraceContext();
   const room = useRoomContext();
@@ -51,6 +53,19 @@ export const SessionView = ({
       if (lastMessage.id !== lastProcessedMessageId.current) {
         addMessage(lastMessage);
         lastProcessedMessageId.current = lastMessage.id;
+
+        // Auto-show browser automation viewer when browser automation is mentioned
+        if (lastMessage.message) {
+          const messageText = lastMessage.message.toLowerCase();
+          if (messageText.includes('browser automation') || 
+              messageText.includes('web automation') || 
+              messageText.includes('browsing') ||
+              messageText.includes('searching the web') ||
+              messageText.includes('opening website') ||
+              messageText.includes('navigating to')) {
+            setBrowserAutomationOpen(true);
+          }
+        }
       }
     }
   }, [messages, sessionStarted, addMessage]);
@@ -209,38 +224,72 @@ export const SessionView = ({
         )}
       />
 
-      {/* Toggle Button for Streaming Panel */}
+      {/* Browser Automation Viewer */}
+      <BrowserAutomationViewer
+        isVisible={browserAutomationOpen && sessionStarted}
+        className={cn(
+          browserAutomationOpen ? 'translate-x-0' : 'translate-x-full'
+        )}
+      />
+
+      {/* Toggle Buttons for Panels */}
       {sessionStarted && (
-        <motion.button
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          onClick={() => setStreamingPanelOpen(!streamingPanelOpen)}
-          className="bg-background/80 border-border hover:bg-background/90 absolute top-20 right-4 z-50 rounded-lg border p-2 shadow-lg backdrop-blur-sm transition-colors"
-          title={streamingPanelOpen ? 'Hide transcript' : 'Show transcript'}
+          className="absolute top-20 right-4 z-50 flex flex-col gap-2"
         >
-          <div className="flex h-5 w-5 items-center justify-center">
-            {streamingPanelOpen ? (
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            ) : (
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+          {/* Streaming Panel Toggle */}
+          <button
+            onClick={() => setStreamingPanelOpen(!streamingPanelOpen)}
+            className="bg-background/80 border-border hover:bg-background/90 rounded-lg border p-2 shadow-lg backdrop-blur-sm transition-colors"
+            title={streamingPanelOpen ? 'Hide transcript' : 'Show transcript'}
+          >
+            <div className="flex h-5 w-5 items-center justify-center">
+              {streamingPanelOpen ? (
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              ) : (
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              )}
+            </div>
+          </button>
+
+          {/* Browser Automation Toggle */}
+          <button
+            onClick={() => setBrowserAutomationOpen(!browserAutomationOpen)}
+            className={cn(
+              "bg-background/80 border-border hover:bg-background/90 rounded-lg border p-2 shadow-lg backdrop-blur-sm transition-colors",
+              browserAutomationOpen && "bg-blue-50 border-blue-200"
             )}
-          </div>
-        </motion.button>
+            title={browserAutomationOpen ? 'Hide browser automation' : 'Show browser automation'}
+          >
+            <div className="flex h-5 w-5 items-center justify-center">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+          </button>
+        </motion.div>
       )}
     </main>
   );

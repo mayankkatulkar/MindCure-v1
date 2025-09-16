@@ -105,7 +105,7 @@ User Speech Input
        │
        ▼
 ┌─────────────────┐
-│ Text-to-Speech  │ ◄─ Cartesia / ElevenLabs
+│ Text-to-Speech  │ ◄─ Gemini
 │ (TTS)          │    • Natural voice synthesis
 │                │    • Emotional tone matching
 └─────────────────┘

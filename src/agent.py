@@ -37,6 +37,9 @@ from llamaindex_rag import setup_combined_agent
 # Import for AutoGen Operator
 from autogen_operator import run_operator_task, search_therapists_near, book_therapy_appointment, get_crisis_help
 
+# Import Browser Automation
+from browser import run_browser_automation
+
 # Import shared data store
 from shared_data import shared_data
 
@@ -108,6 +111,43 @@ class Assistant(Agent):
         except Exception as e:
             logger.error(f"AutoGen operator failed: {e}")
             return "I encountered an issue with the automation. Let me help you with the information I have available instead."
+
+    @function_tool
+    async def browser_automation_tool(self, context: RunContext, task: str, max_steps: int = 50, headless: bool = True):
+        """
+        Use this tool to perform advanced browser automation tasks with real-time streaming capabilities.
+        This tool provides comprehensive web automation including form filling, navigation, data extraction, 
+        and interaction with websites. Perfect for complex multi-step web tasks.
+        
+        Examples:
+        - "Navigate to Psychology Today and search for therapists in San Francisco"
+        - "Fill out a contact form on a mental health clinic website"
+        - "Book an appointment on a therapy booking platform"
+        - "Extract therapist information and contact details from multiple clinic websites"
+        - "Search for mental health resources and compile a list"
+        - "Navigate through insurance provider websites to check therapy coverage"
+        
+        Args:
+            task: Detailed description of the browser automation task to perform
+            max_steps: Maximum number of automation steps to perform (default: 50)
+            headless: Whether to run browser in headless mode (default: True)
+        """
+        try:
+            logger.info(f"Starting browser automation task: {task}")
+            
+            # Call the browser automation function from browser.py
+            result = await run_browser_automation(
+                task=task,
+                max_steps=max_steps,
+                headless=headless
+            )
+            
+            logger.info(f"Browser automation completed successfully")
+            return str(result)
+            
+        except Exception as e:
+            logger.error(f"Browser automation failed: {e}")
+            return f"I encountered an error while performing the browser automation task: {str(e)}. I can still help you with information I have available or try a different approach."
 
     @function_tool
     async def web_automation_tool(self, context: RunContext, task: str):
